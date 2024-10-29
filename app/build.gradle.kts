@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 
     id("kotlin-kapt")
+    id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
 }
 
@@ -77,7 +78,12 @@ dependencies {
     implementation(libs.work.runtime.ktx)
     implementation(libs.hilt.work)
     implementation(libs.lifecycle.service)
-    kapt(libs.hilt.android.compiler)
+
+    implementation(libs.room.ktx)
+    implementation(libs.room.runtime)
+    ksp(libs.androidx.room.compiler)
+
+    ksp(libs.hilt.android.compiler)
 
     implementation(libs.health.services.client)
     implementation(libs.guava)

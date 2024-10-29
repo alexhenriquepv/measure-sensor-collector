@@ -24,6 +24,7 @@ class PermissionViewModel : ViewModel() {
         permissionLauncher.launch(
             arrayOf(
                 android.Manifest.permission.BODY_SENSORS,
+                android.Manifest.permission.FOREGROUND_SERVICE,
                 android.Manifest.permission.FOREGROUND_SERVICE_HEALTH
             )
         )

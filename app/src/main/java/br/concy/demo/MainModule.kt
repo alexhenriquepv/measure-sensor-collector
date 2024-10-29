@@ -6,7 +6,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.health.services.client.HealthServices
 import androidx.health.services.client.HealthServicesClient
-import br.concy.demo.health.HealthServicesManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,9 +27,4 @@ class MainModule {
     @Provides
     fun provideHealthServicesClient(@ApplicationContext context: Context): HealthServicesClient =
         HealthServices.getClient(context)
-
-    @Singleton
-    @Provides
-    fun provideHealthServiceManager(healthServicesClient: HealthServicesClient) =
-        HealthServicesManager(healthServicesClient)
 }

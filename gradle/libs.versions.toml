@@ -1,5 +1,5 @@
 [versions]
-agp = "8.6.0"
+agp = "8.6.1"
 concurrentFutures = "1.2.0"
 datastorePreferences = "1.1.1"
 guava = "31.1-android"
@@ -8,19 +8,23 @@ hiltAndroidCompiler = "2.49"
 hiltNavigationFragment = "1.2.0"
 kotlin = "1.9.0"
 playServicesWearable = "18.2.0"
-lifecycleRuntimeKtx = "2.6.1"
+lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.3"
-composeBom = "2024.04.01"
+composeBom = "2024.10.00"
 composeMaterial = "1.4.0"
 horologist = "0.6.20"
 hilt = "2.49"
 datastoreCoreAndroid = "1.1.1"
 hiltCommon = "1.2.0"
+roomCompilerVersion = "2.6.1"
+roomRuntime = "2.6.1"
 workRuntimeKtx = "2.9.1"
 hiltWork = "1.2.0"
 lifecycleService = "2.8.6"
+roomKtx = "2.6.1"
 
 [libraries]
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompilerVersion" }
 concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrentFutures" }
 concurrent-futures-ktx = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrentFutures" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
@@ -32,6 +36,7 @@ play-services-wearable = { group = "com.google.android.gms", name = "play-servic
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 ui = { group = "androidx.compose.ui", name = "ui" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
@@ -49,6 +54,7 @@ hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hi
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWork" }
 lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycleService" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

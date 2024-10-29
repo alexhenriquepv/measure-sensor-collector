@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,11 +48,11 @@ fun HomePage(modifier: Modifier = Modifier) {
         ),
     )
 
-    var heartRate by remember { mutableDoubleStateOf(0.0) }
+    var heartRate by remember { mutableFloatStateOf(0.0F) }
 
     LaunchedEffect(homeVM.latestHeartRate) {
         homeVM.latestHeartRate.collect {
-            heartRate = it
+            heartRate = it?.bpm ?: 0.0F
         }
     }
 

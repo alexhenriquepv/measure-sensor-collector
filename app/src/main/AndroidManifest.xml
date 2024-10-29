@@ -3,7 +3,10 @@
 
     <uses-feature android:name="android.hardware.type.watch" />
     <uses-permission android:name="android.permission.BODY_SENSORS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <queries>
         <package android:name="com.google.android.wearable.healthservices" />
@@ -33,16 +36,16 @@
         </activity>
 
         <service
-            android:name=".health.HeartRateService"
-            android:enabled="true"
-            android:permission="com.google.android.wearable.healthservices.permission.MEASURE_HEART_RATE"
-            android:exported="true"
-            android:foregroundServiceType="health">
+            android:name=".health.PassiveDataService"
+            android:permission="com.google.android.wearable.healthservices.permission.PASSIVE_DATA_BINDING"
+            android:exported="true" />
 
-            <intent-filter>
-                <action android:name="com.google.android.wearable.action.PASSIVE_DATA_SERVICE" />
-            </intent-filter>
-    </service>
+        <service
+            android:name=".health.MeasureDataService"
+            android:permission="com.google.android.wearable.healthservices.permission.PASSIVE_DATA_BINDING"
+            android:foregroundServiceType="health"
+            android:enabled="true"
+            android:exported="true" />
 
     </application>
 
