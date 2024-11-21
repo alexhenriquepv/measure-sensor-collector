@@ -87,6 +87,8 @@ dependencies {
 
     implementation(libs.health.services.client)
     implementation(libs.guava)
+    implementation(libs.retrofit)
+    implementation(libs.gson)
 
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)

@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,6 +39,7 @@ import com.google.android.horologist.compose.material.ResponsiveListHeader
 @Composable
 fun HomePage(modifier: Modifier = Modifier) {
 
+    val ctx = LocalContext.current
     val homeVM: HomeViewModel = viewModel()
     val homeUIState = homeVM.uiState.collectAsState()
 
@@ -100,7 +102,7 @@ fun HomePage(modifier: Modifier = Modifier) {
                 Button(
                     modifier = Modifier.padding(top = 8.dp),
                     onClick = {
-                        homeVM.startCollect()
+                        homeVM.startCollect(ctx)
                     },
                 ) {
                     Icon(
@@ -115,7 +117,7 @@ fun HomePage(modifier: Modifier = Modifier) {
                         backgroundColor = MaterialTheme.colors.secondary
                     ),
                     onClick = {
-                        homeVM.stopCollect()
+                        homeVM.stopCollect(ctx)
                     },
                 ) {
                     Icon(

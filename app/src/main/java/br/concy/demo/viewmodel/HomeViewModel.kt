@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 import androidx.concurrent.futures.await
 import androidx.core.content.ContextCompat.startForegroundService
 import androidx.health.services.client.HealthServicesClient
@@ -23,12 +24,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    application: Application,
     repository: HeartRateRepository,
     healthServicesClient: HealthServicesClient
 ): ViewModel() {
 
-    private val ctx = application.applicationContext
     private val _uiState = MutableStateFlow<HomeUIState>(HomeUIState.Default)
 
     private val passiveMonitoringClient = healthServicesClient.passiveMonitoringClient
@@ -37,12 +36,12 @@ class HomeViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
     val latestHeartRate = repository.lastMeasurement
 
-    fun startCollect() {
-        startMeasureService()
+    fun startCollect(ctx: Context) {
+        startMeasureService(ctx)
     }
 
-    fun stopCollect() {
-        stopMeasureService()
+    fun stopCollect(ctx: Context) {
+        stopMeasureService(ctx)
     }
 
     private suspend fun hasPassiveHeartRateCapability(): Boolean {
@@ -79,7 +78,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun startMeasureService() {
+    private fun startMeasureService(ctx: Context) {
         viewModelScope.launch {
             if (hasMeasureHeartRateCapability()) {
                 val intent = Intent(ctx, MeasureDataService::class.java)
@@ -89,7 +88,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun stopMeasureService() {
+    private fun stopMeasureService(ctx: Context) {
         val intent = Intent(ctx, MeasureDataService::class.java)
         ctx.stopService(intent)
         _uiState.value = HomeUIState.Default

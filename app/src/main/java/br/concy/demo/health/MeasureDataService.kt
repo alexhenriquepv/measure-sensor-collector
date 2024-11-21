@@ -4,9 +4,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
-import androidx.concurrent.futures.await
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.health.services.client.HealthServicesClient
 import androidx.health.services.client.MeasureCallback
@@ -17,14 +16,22 @@ import androidx.health.services.client.data.DataTypeAvailability
 import androidx.health.services.client.data.DeltaDataType
 import androidx.health.services.client.unregisterMeasureCallback
 import br.concy.demo.R
+import br.concy.demo.TAG
 import br.concy.demo.model.entity.HeartHateMeasurement
 import br.concy.demo.model.repository.HeartRateRepository
+import br.concy.demo.model.response.SendRegisterResponse
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MeasureDataService: Service() {
+
+    @Inject
+    lateinit var apiService: HeartRateAPIService
 
     @Inject
     lateinit var healthServicesClient: HealthServicesClient
@@ -56,6 +63,12 @@ class MeasureDataService: Service() {
 
                     runBlocking {
                         repository.insert(measurement)
+                        try {
+                            val res = apiService.sendRegister(measurement)
+                            Log.d(TAG, "Registered: $res")
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Fail: ${e.message}")
+                        }
                     }
                 }
             }
