@@ -81,6 +81,7 @@ dependencies {
 
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
+    implementation(files("libs/samsung-health-sensor-api-1.3.0.aar"))
     ksp(libs.androidx.room.compiler)
 
     ksp(libs.hilt.android.compiler)
