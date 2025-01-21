@@ -13,9 +13,12 @@ import com.samsung.android.service.health.tracking.HealthTrackingService
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -30,6 +33,7 @@ class EcgManager(
     private val onStopTracking: (itemsCount: Int) -> Unit,
     private val onSavingOnDB: () -> Unit,
     private val onSendingToRemote: () -> Unit,
+    private val scope: CoroutineScope
 ) {
 
     private lateinit var htService: HealthTrackingService
@@ -39,6 +43,7 @@ class EcgManager(
     private val _ecgBuffer = mutableListOf<Float>()
 
     val countdown = _countdownTime.asStateFlow()
+    private var countdownJob: Job? = null
 
     private val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
@@ -133,14 +138,19 @@ class EcgManager(
     }
 
     fun startCountdown() {
-        Log.d(TAG, "startCountdown")
-        runBlocking {
-            while (_countdownTime.value > 0) {
-                delay(DURATION)
-                _countdownTime.value -= DURATION
-            }
+        if (countdownJob?.isActive == true) {
+            Log.d(TAG, "Countdown already running")
+        } else {
+            Log.d(TAG, "startCountdown")
+            countdownJob = scope.launch {
+                while (_countdownTime.value > 0) {
+                    delay(DURATION)
+                    _countdownTime.value -= DURATION
+                }
 
-            stopTracking()
+                Log.d(TAG, "stopCountdown")
+                stopTracking()
+            }
         }
     }
 
@@ -154,11 +164,17 @@ class EcgManager(
 
     fun stopTracking() {
         Log.d(TAG, "stopTracking")
+
+        countdownJob?.cancel()
+        countdownJob = null
+
         onStopTracking(_ecgBuffer.size)
         ecgTracker.unsetEventListener()
 
         if (_ecgBuffer.size == 0) {
             resetSetup()
+        } else {
+            Log.d(TAG, "measurements count: ${_ecgBuffer.size}")
         }
     }
 

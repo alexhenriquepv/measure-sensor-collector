@@ -51,7 +51,8 @@ class HomeViewModel @Inject constructor(
         },
         onSendingToRemote = {
             _uiState.value = HomeUIState.SendingToRemote()
-        }
+        },
+        scope = viewModelScope
     )
 
     val countdown = ecgManager.countdown
