@@ -1,9 +1,6 @@
 package br.concy.demo
 
-import android.app.Application
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.health.services.client.HealthServices
 import androidx.health.services.client.HealthServicesClient
 import dagger.Module
@@ -16,12 +13,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class MainModule {
-
-    @Singleton
-    @Provides
-    fun provideDataStore(
-        application: Application
-    ): DataStore<Preferences> = application.applicationContext.dataStore
 
     @Singleton
     @Provides

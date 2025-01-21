@@ -1,21 +1,21 @@
 package br.concy.demo.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -23,17 +23,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
+import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.compose.material.TitleCard
 import br.concy.demo.ui.theme.DemoTheme
 import br.concy.demo.viewmodel.HomeViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
-import com.google.android.horologist.compose.material.ResponsiveListHeader
+import com.google.android.horologist.compose.material.Button
+import com.google.android.horologist.compose.material.Chip
 
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
@@ -42,89 +42,132 @@ fun HomePage(modifier: Modifier = Modifier) {
     val ctx = LocalContext.current
     val homeVM: HomeViewModel = viewModel()
     val homeUIState = homeVM.uiState.collectAsState()
+    val countdown = homeVM.countdown.collectAsState()
 
     val listState = rememberResponsiveColumnState(
         contentPadding = ScalingLazyColumnDefaults.padding(
             first = ScalingLazyColumnDefaults.ItemType.Text,
             last = ScalingLazyColumnDefaults.ItemType.SingleButton,
         ),
+        verticalArrangement = Arrangement.Center,
     )
 
-    var heartRate by remember { mutableFloatStateOf(0.0F) }
-
-    LaunchedEffect(homeVM.latestHeartRate) {
-        homeVM.latestHeartRate.collect {
-            heartRate = it?.bpm ?: 0.0F
-        }
+    LaunchedEffect(Unit) {
+        homeVM.setup(ctx)
     }
 
     ScalingLazyColumn(
-        modifier = Modifier.background(MaterialTheme.colors.background),
-        columnState = listState
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background),
+        columnState = listState,
     ) {
+
         item {
-            ResponsiveListHeader {
-                Text(
-                    text = "Data collector",
-                    color = MaterialTheme.colors.onSurfaceVariant,
-                    fontSize = 16.sp
-                )
+
+            val title = when(homeUIState.value) {
+                is HomeUIState.Setup -> (homeUIState.value as HomeUIState.Setup).message
+                is HomeUIState.Default -> (homeUIState.value as HomeUIState.Default).message
+                is HomeUIState.Tracking -> (homeUIState.value as HomeUIState.Tracking).message
+                is HomeUIState.Error -> (homeUIState.value as HomeUIState.Error).message
+                is HomeUIState.StopTracking -> (homeUIState.value as HomeUIState.StopTracking).message
+                is HomeUIState.SavingOnDB -> (homeUIState.value as HomeUIState.SavingOnDB).message
+                is HomeUIState.SendingToRemote -> (homeUIState.value as HomeUIState.SendingToRemote).message
             }
-        }
 
-        item {
-            val color = if (homeUIState.value == HomeUIState.Default)
-                MaterialTheme.colors.onSurfaceVariant
-                else MaterialTheme.colors.secondary
-
-            TitleCard(
-                onClick = {},
-                title = {
-                    val text = if (homeUIState.value == HomeUIState.Default) "Sensor inactivated" else "Sensor activated"
-                    Text(text, color = color)
-                },
-                titleColor = MaterialTheme.colors.onSurfaceVariant
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val text = if (homeUIState.value == HomeUIState.Default) "Active the sensor" else "$heartRate bps"
-
                 Text(
-                    modifier = modifier,
-                    text = text,
+                    modifier = modifier.padding(bottom = 8.dp),
+                    text = title,
                     textAlign = TextAlign.Center,
-                    color = color,
-                    fontSize = 12.sp
+                    color = MaterialTheme.colors.primary
                 )
+
+                if (homeUIState.value is HomeUIState.Tracking) {
+                    Text(
+                        modifier = modifier,
+                        text = "${countdown.value / 1000}s",
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colors.secondary,
+                        fontSize = 14.sp
+                    )
+                }
             }
         }
 
         item {
-            if (homeUIState.value == HomeUIState.Default) {
-                Button(
-                    modifier = Modifier.padding(top = 8.dp),
-                    onClick = {
-                        homeVM.startCollect(ctx)
-                    },
-                ) {
-                    Icon(
+            when (homeUIState.value) {
+
+                is HomeUIState.Default -> {
+                    Button(
+                        modifier = Modifier.padding(top = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colors.secondary
+                        ),
+                        onClick = {
+                            homeVM.startTracking()
+                        },
                         imageVector = Icons.Default.PlayArrow,
                         contentDescription = "Start data collect"
                     )
                 }
-            } else {
-                Button(
-                    modifier = Modifier.padding(top = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.secondary
-                    ),
-                    onClick = {
-                        homeVM.stopCollect(ctx)
-                    },
-                ) {
-                    Icon(
+
+                is HomeUIState.Tracking -> {
+                    Button(
+                        modifier = Modifier.padding(top = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colors.secondary
+                        ),
+                        onClick = {
+                            homeVM.stopTracking()
+                        },
                         imageVector = Icons.Default.Close,
                         contentDescription = "Stop data collect"
                     )
                 }
+
+                is HomeUIState.StopTracking -> {
+                    Row {
+                        Button(
+                            modifier = Modifier.padding(top = 8.dp, end = 16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.error
+                            ),
+                            onClick = {
+                                homeVM.resetSetup()
+                            },
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Clear Data"
+                        )
+
+                        Button(
+                            modifier = Modifier.padding(top = 8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.secondary
+                            ),
+                            onClick = {
+                                homeVM.saveOnDatabase()
+                            },
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Save data"
+                        )
+                    }
+                }
+
+                is HomeUIState.Error -> {
+                    Chip(
+                        label = "Try again",
+                        colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
+                        onClick = {
+                            homeVM.setup(ctx)
+                        }
+                    )
+                }
+
+                else -> {}
             }
         }
     }
@@ -132,7 +175,7 @@ fun HomePage(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun HomePagePreview() {
+fun HomePage2Preview() {
     DemoTheme {
         HomePage()
     }

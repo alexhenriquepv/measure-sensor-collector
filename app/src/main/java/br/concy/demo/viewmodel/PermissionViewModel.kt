@@ -25,7 +25,8 @@ class PermissionViewModel : ViewModel() {
             arrayOf(
                 android.Manifest.permission.BODY_SENSORS,
                 android.Manifest.permission.FOREGROUND_SERVICE,
-                android.Manifest.permission.FOREGROUND_SERVICE_HEALTH
+                android.Manifest.permission.FOREGROUND_SERVICE_HEALTH,
+                android.Manifest.permission.ACTIVITY_RECOGNITION
             )
         )
     }

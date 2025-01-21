@@ -1,6 +1,7 @@
 package br.concy.demo
 
 import android.content.Context
+import br.concy.demo.health.EcgAPIService
 import br.concy.demo.health.HeartRateAPIService
 import dagger.Module
 import dagger.Provides
@@ -16,9 +17,9 @@ import javax.inject.Singleton
 class APIModule {
     @Singleton
     @Provides
-    fun provideRetrofit(@ApplicationContext context: Context): Retrofit {
+    fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://192.168.1.32:3000")
+            .baseUrl("http://10.224.1.28/Sistema-Embarcado-de-Aquisicao-de-Sinais-de-ECG/Model_Web_IA_Arritmias/backend/API/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -27,5 +28,11 @@ class APIModule {
     @Provides
     fun provideHeartRateApiService(retrofit: Retrofit): HeartRateAPIService {
         return retrofit.create(HeartRateAPIService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideEcgApiService(retrofit: Retrofit): EcgAPIService {
+        return retrofit.create(EcgAPIService::class.java)
     }
 }

@@ -1,6 +1,5 @@
 package br.concy.demo.model.response
 
-data class SendRegisterResponse(
+data class EcgResponse(
     val message: String,
-    val bpm: Float
 )

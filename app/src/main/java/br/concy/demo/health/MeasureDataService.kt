@@ -19,12 +19,8 @@ import br.concy.demo.R
 import br.concy.demo.TAG
 import br.concy.demo.model.entity.HeartHateMeasurement
 import br.concy.demo.model.repository.HeartRateRepository
-import br.concy.demo.model.response.SendRegisterResponse
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 
 @AndroidEntryPoint

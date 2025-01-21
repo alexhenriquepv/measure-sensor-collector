@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import br.concy.demo.health.HeartRateDataRepository.Companion.PREFERENCES_FILE_NAME
+import androidx.work.impl.utils.PreferenceUtils.PREFERENCES_FILE_NAME
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -22,5 +22,4 @@ class MainApp: Application(), Configuration.Provider {
             .build()
 }
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(PREFERENCES_FILE_NAME)
 const val TAG = "Demo Sensor App"
