@@ -22,7 +22,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.MaterialTheme
@@ -37,10 +38,13 @@ import com.google.android.horologist.compose.material.Chip
 
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
-fun HomePage(modifier: Modifier = Modifier) {
+fun DataCollectionScreen(
+    modifier: Modifier = Modifier,
+    patientId: Int
+) {
 
     val ctx = LocalContext.current
-    val homeVM: HomeViewModel = viewModel()
+    val homeVM: HomeViewModel = hiltViewModel()
     val homeUIState = homeVM.uiState.collectAsState()
     val countdown = homeVM.countdown.collectAsState()
 
@@ -53,7 +57,7 @@ fun HomePage(modifier: Modifier = Modifier) {
     )
 
     LaunchedEffect(Unit) {
-        homeVM.setup(ctx)
+        homeVM.setup(ctx, patientId)
     }
 
     ScalingLazyColumn(
@@ -66,13 +70,13 @@ fun HomePage(modifier: Modifier = Modifier) {
         item {
 
             val title = when(homeUIState.value) {
-                is HomeUIState.Setup -> (homeUIState.value as HomeUIState.Setup).message
-                is HomeUIState.Default -> (homeUIState.value as HomeUIState.Default).message
-                is HomeUIState.Tracking -> (homeUIState.value as HomeUIState.Tracking).message
-                is HomeUIState.Error -> (homeUIState.value as HomeUIState.Error).message
-                is HomeUIState.StopTracking -> (homeUIState.value as HomeUIState.StopTracking).message
-                is HomeUIState.SavingOnDB -> (homeUIState.value as HomeUIState.SavingOnDB).message
-                is HomeUIState.SendingToRemote -> (homeUIState.value as HomeUIState.SendingToRemote).message
+                is DataCollectionUIState.Setup -> (homeUIState.value as DataCollectionUIState.Setup).message
+                is DataCollectionUIState.Default -> (homeUIState.value as DataCollectionUIState.Default).message
+                is DataCollectionUIState.Tracking -> (homeUIState.value as DataCollectionUIState.Tracking).message
+                is DataCollectionUIState.Error -> (homeUIState.value as DataCollectionUIState.Error).message
+                is DataCollectionUIState.StopTracking -> (homeUIState.value as DataCollectionUIState.StopTracking).message
+                is DataCollectionUIState.SavingOnDB -> (homeUIState.value as DataCollectionUIState.SavingOnDB).message
+                is DataCollectionUIState.SendingToRemote -> (homeUIState.value as DataCollectionUIState.SendingToRemote).message
             }
 
             Column(
@@ -86,7 +90,7 @@ fun HomePage(modifier: Modifier = Modifier) {
                     color = MaterialTheme.colors.primary
                 )
 
-                if (homeUIState.value is HomeUIState.Tracking) {
+                if (homeUIState.value is DataCollectionUIState.Tracking) {
                     Text(
                         modifier = modifier,
                         text = "${countdown.value / 1000}s",
@@ -101,7 +105,7 @@ fun HomePage(modifier: Modifier = Modifier) {
         item {
             when (homeUIState.value) {
 
-                is HomeUIState.Default -> {
+                is DataCollectionUIState.Default -> {
                     Button(
                         modifier = Modifier.padding(top = 8.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -115,7 +119,7 @@ fun HomePage(modifier: Modifier = Modifier) {
                     )
                 }
 
-                is HomeUIState.Tracking -> {
+                is DataCollectionUIState.Tracking -> {
                     Button(
                         modifier = Modifier.padding(top = 8.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -129,7 +133,7 @@ fun HomePage(modifier: Modifier = Modifier) {
                     )
                 }
 
-                is HomeUIState.StopTracking -> {
+                is DataCollectionUIState.StopTracking -> {
                     Row {
                         Button(
                             modifier = Modifier.padding(top = 8.dp, end = 16.dp),
@@ -157,12 +161,12 @@ fun HomePage(modifier: Modifier = Modifier) {
                     }
                 }
 
-                is HomeUIState.Error -> {
+                is DataCollectionUIState.Error -> {
                     Chip(
                         label = "Try again",
                         colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
                         onClick = {
-                            homeVM.setup(ctx)
+                            homeVM.setup(ctx, patientId)
                         }
                     )
                 }
@@ -170,13 +174,5 @@ fun HomePage(modifier: Modifier = Modifier) {
                 else -> {}
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomePage2Preview() {
-    DemoTheme {
-        HomePage()
     }
 }

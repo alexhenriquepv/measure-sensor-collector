@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.horologist.compose.layout)
     implementation(libs.horologist.compose.material)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.navigation.fragment)
     implementation(libs.datastore.core.android)
     implementation(libs.datastore.preferences)
@@ -82,6 +83,7 @@ dependencies {
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
     implementation(files("libs/samsung-health-sensor-api-1.3.0.aar"))
+    implementation(libs.androidx.navigation.compose)
     ksp(libs.androidx.room.compiler)
 
     ksp(libs.hilt.android.compiler)

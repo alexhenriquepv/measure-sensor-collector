@@ -1,6 +1,6 @@
 package br.concy.demo.health
 
-import br.concy.demo.model.entity.EcgRequest
+import br.concy.demo.model.request.EcgRequest
 import br.concy.demo.model.response.EcgResponse
 import retrofit2.http.Body
 import retrofit2.http.POST

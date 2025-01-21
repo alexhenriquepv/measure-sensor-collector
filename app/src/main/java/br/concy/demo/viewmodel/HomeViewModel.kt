@@ -1,14 +1,12 @@
 package br.concy.demo.viewmodel
 
 import android.content.Context
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import br.concy.demo.health.EcgAPIService
 import br.concy.demo.health.EcgManager
 import br.concy.demo.model.repository.EcgRepository
-import br.concy.demo.view.HomeUIState
+import br.concy.demo.view.DataCollectionUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,8 +19,8 @@ class HomeViewModel @Inject constructor(
     ecgRepository: EcgRepository
 ): ViewModel() {
 
-    private val _uiState = MutableStateFlow<HomeUIState>(
-        HomeUIState.Default("Start data collect")
+    private val _uiState = MutableStateFlow<DataCollectionUIState>(
+        DataCollectionUIState.Default("Start data collect")
     )
 
     val uiState = _uiState.asStateFlow()
@@ -31,37 +29,38 @@ class HomeViewModel @Inject constructor(
         apiService,
         ecgRepository,
         onError = { message: String ->
-            _uiState.value = HomeUIState.Error(message)
+            _uiState.value = DataCollectionUIState.Error(message)
         },
         onServiceConnection = {
-            _uiState.value = HomeUIState.Default()
+            _uiState.value = DataCollectionUIState.Default()
         },
         onStartTracking = {
-            _uiState.value = HomeUIState.Tracking()
+            _uiState.value = DataCollectionUIState.Tracking()
         },
         onStopTracking = { itemsCount ->
             if (itemsCount > 0) {
-                _uiState.value = HomeUIState.StopTracking("Collected count: $itemsCount")
+                _uiState.value = DataCollectionUIState.StopTracking("Collected count: $itemsCount")
             } else {
-                _uiState.value = HomeUIState.Default()
+                _uiState.value = DataCollectionUIState.Default()
             }
         },
         onSavingOnDB = {
-            _uiState.value = HomeUIState.SavingOnDB()
+            _uiState.value = DataCollectionUIState.SavingOnDB()
         },
         onSendingToRemote = {
-            _uiState.value = HomeUIState.SendingToRemote()
+            _uiState.value = DataCollectionUIState.SendingToRemote()
         },
         scope = viewModelScope
     )
 
     val countdown = ecgManager.countdown
 
-    fun setup(context: Context) {
+    fun setup(context: Context, patientId: Int) {
         if (ecgManager.isInitialized()) {
-            _uiState.value = HomeUIState.Default()
+            _uiState.value = DataCollectionUIState.Default()
         } else {
-            _uiState.value = HomeUIState.Setup()
+            ecgManager.setPatientId(patientId)
+            _uiState.value = DataCollectionUIState.Setup()
             ecgManager.setupSamsungConnection(context)
         }
     }
@@ -82,7 +81,7 @@ class HomeViewModel @Inject constructor(
 
     fun resetSetup() {
         ecgManager.resetSetup()
-        _uiState.value = HomeUIState.Default()
+        _uiState.value = DataCollectionUIState.Default()
     }
 
     companion object {

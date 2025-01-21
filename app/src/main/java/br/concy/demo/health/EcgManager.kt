@@ -3,7 +3,7 @@ package br.concy.demo.health
 import android.content.Context
 import android.util.Log
 import br.concy.demo.model.entity.EcgMeasurement
-import br.concy.demo.model.entity.EcgRequest
+import br.concy.demo.model.request.EcgRequest
 import br.concy.demo.model.repository.EcgRepository
 import br.concy.demo.viewmodel.HomeViewModel.Companion.TAG
 import com.samsung.android.service.health.tracking.ConnectionListener
@@ -44,6 +44,7 @@ class EcgManager(
 
     val countdown = _countdownTime.asStateFlow()
     private var countdownJob: Job? = null
+    private var patientId = 0
 
     private val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
@@ -70,6 +71,10 @@ class EcgManager(
             Log.e(TAG, "TrackerError: " + err.toString())
             onError(err.toString())
         }
+    }
+
+    fun setPatientId(id: Int) {
+        patientId = id
     }
 
     fun setupSamsungConnection(context: Context) {
@@ -116,14 +121,14 @@ class EcgManager(
     }
 
     private suspend fun sentToRemote() {
-        Log.d(TAG, "sentToRemote")
+        Log.d(TAG, "sentToRemote - Patient ID: $patientId")
         onSendingToRemote()
 
         try {
             val measurements = ecgRepository.getAll()
 
             val requestData = EcgRequest(
-                patient_id = 14,
+                patient_id = patientId,
                 measurements = measurements
             )
 

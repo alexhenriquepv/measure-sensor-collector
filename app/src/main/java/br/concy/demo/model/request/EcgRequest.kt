@@ -1,5 +1,6 @@
-package br.concy.demo.model.entity
+package br.concy.demo.model.request
 
+import br.concy.demo.model.entity.EcgMeasurement
 import java.util.Date
 
 data class EcgRequest(
