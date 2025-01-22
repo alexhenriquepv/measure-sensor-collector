@@ -19,16 +19,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.ChipDefaults
+import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
-import br.concy.demo.ui.theme.DemoTheme
-import br.concy.demo.viewmodel.HomeViewModel
+import androidx.wear.compose.material.ProgressIndicatorDefaults
+import br.concy.demo.uistate.DataCollectionUIState
+import br.concy.demo.viewmodel.DataCollectionViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
@@ -44,7 +44,7 @@ fun DataCollectionScreen(
 ) {
 
     val ctx = LocalContext.current
-    val homeVM: HomeViewModel = hiltViewModel()
+    val homeVM: DataCollectionViewModel = hiltViewModel()
     val homeUIState = homeVM.uiState.collectAsState()
     val countdown = homeVM.countdown.collectAsState()
 
@@ -77,6 +77,7 @@ fun DataCollectionScreen(
                 is DataCollectionUIState.StopTracking -> (homeUIState.value as DataCollectionUIState.StopTracking).message
                 is DataCollectionUIState.SavingOnDB -> (homeUIState.value as DataCollectionUIState.SavingOnDB).message
                 is DataCollectionUIState.SendingToRemote -> (homeUIState.value as DataCollectionUIState.SendingToRemote).message
+                is DataCollectionUIState.Complete -> (homeUIState.value as DataCollectionUIState.Complete).message
             }
 
             Column(
@@ -161,9 +162,39 @@ fun DataCollectionScreen(
                     }
                 }
 
+                is DataCollectionUIState.SavingOnDB -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.fillMaxSize().padding(all = 1.dp),
+                        startAngle = 295.5f,
+                        endAngle = 245.5f,
+                        progress = 0.3f,
+                        strokeWidth = ProgressIndicatorDefaults.FullScreenStrokeWidth
+                    )
+                }
+
+                is DataCollectionUIState.SendingToRemote -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.fillMaxSize().padding(all = 1.dp),
+                        startAngle = 295.5f,
+                        endAngle = 245.5f,
+                        progress = 0.3f,
+                        strokeWidth = ProgressIndicatorDefaults.FullScreenStrokeWidth
+                    )
+                }
+
                 is DataCollectionUIState.Error -> {
                     Chip(
                         label = "Try again",
+                        colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
+                        onClick = {
+                            homeVM.setup(ctx, patientId)
+                        }
+                    )
+                }
+
+                is DataCollectionUIState.Complete -> {
+                    Chip(
+                        label = "Restart",
                         colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
                         onClick = {
                             homeVM.setup(ctx, patientId)

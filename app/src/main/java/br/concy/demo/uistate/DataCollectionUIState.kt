@@ -1,4 +1,4 @@
-package br.concy.demo.view
+package br.concy.demo.uistate
 
 sealed class DataCollectionUIState {
     data class Default(val message: String = "No collecting"): DataCollectionUIState()
@@ -7,5 +7,6 @@ sealed class DataCollectionUIState {
     data class StopTracking(val message: String = "Data already collected"): DataCollectionUIState()
     data class SavingOnDB(val message: String = "Saving on Database"): DataCollectionUIState()
     data class SendingToRemote(val message: String = "Sending to server"): DataCollectionUIState()
+    data class Complete(val message: String = ""): DataCollectionUIState()
     data class Error(val message: String): DataCollectionUIState()
 }

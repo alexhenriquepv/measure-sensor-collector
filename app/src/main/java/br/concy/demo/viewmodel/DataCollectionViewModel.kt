@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import br.concy.demo.health.EcgAPIService
 import br.concy.demo.health.EcgManager
 import br.concy.demo.model.repository.EcgRepository
-import br.concy.demo.view.DataCollectionUIState
+import br.concy.demo.uistate.DataCollectionUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class DataCollectionViewModel @Inject constructor(
     apiService: EcgAPIService,
     ecgRepository: EcgRepository
 ): ViewModel() {
@@ -49,6 +49,9 @@ class HomeViewModel @Inject constructor(
         },
         onSendingToRemote = {
             _uiState.value = DataCollectionUIState.SendingToRemote()
+        },
+        onComplete = {
+            _uiState.value = DataCollectionUIState.Complete()
         },
         scope = viewModelScope
     )

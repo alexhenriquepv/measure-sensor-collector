@@ -5,7 +5,7 @@ import android.util.Log
 import br.concy.demo.model.entity.EcgMeasurement
 import br.concy.demo.model.request.EcgRequest
 import br.concy.demo.model.repository.EcgRepository
-import br.concy.demo.viewmodel.HomeViewModel.Companion.TAG
+import br.concy.demo.viewmodel.DataCollectionViewModel.Companion.TAG
 import com.samsung.android.service.health.tracking.ConnectionListener
 import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.HealthTrackerException
@@ -33,6 +33,7 @@ class EcgManager(
     private val onStopTracking: (itemsCount: Int) -> Unit,
     private val onSavingOnDB: () -> Unit,
     private val onSendingToRemote: () -> Unit,
+    private val onComplete: () -> Unit,
     private val scope: CoroutineScope
 ) {
 
@@ -56,9 +57,14 @@ class EcgManager(
             }
 
             if (list.isNotEmpty()) {
-                for (dp in list) {
-                    val currentECG = dp.getValue(ValueKey.EcgSet.ECG_MV)
-                    _ecgBuffer.add(currentECG)
+                val leadOff = list[0].getValue(ValueKey.EcgSet.LEAD_OFF)
+                if (leadOff == 5) {
+                    Log.e(TAG, "LEAD_OFF")
+                } else {
+                    for (dp in list) {
+                        val currentECG = dp.getValue(ValueKey.EcgSet.ECG_MV)
+                        _ecgBuffer.add(currentECG)
+                    }
                 }
             }
         }
@@ -134,6 +140,7 @@ class EcgManager(
 
             val res = apiService.sendRegister(requestData)
             Log.d(TAG, res.message)
+            onComplete()
         } catch (e: Exception) {
             Log.e(TAG, "Fail: $e")
             onError("${e.message}")
