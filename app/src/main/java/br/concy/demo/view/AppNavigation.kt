@@ -28,7 +28,7 @@ fun AppNavigation() {
             )
         ) { backStackEntry ->
             val patientId = backStackEntry.arguments?.getInt("patient_id") ?: 0
-            DataCollectionScreen(patientId = patientId)
+            DataCollectionScreen(patientId = patientId, navController = navController)
         }
     }
 }

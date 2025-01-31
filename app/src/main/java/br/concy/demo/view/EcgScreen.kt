@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.CircularProgressIndicator
@@ -40,13 +41,14 @@ import com.google.android.horologist.compose.material.Chip
 @Composable
 fun DataCollectionScreen(
     modifier: Modifier = Modifier,
-    patientId: Int
+    patientId: Int,
+    navController: NavController
 ) {
 
     val ctx = LocalContext.current
-    val homeVM: EcgViewModel = hiltViewModel()
-    val homeUIState = homeVM.uiState.collectAsState()
-    val countdown = homeVM.countdown.collectAsState()
+    val ecgVM: EcgViewModel = hiltViewModel()
+    val ecgUIState = ecgVM.uiState.collectAsState()
+    val countdown = ecgVM.countdown.collectAsState()
 
     val listState = rememberResponsiveColumnState(
         contentPadding = ScalingLazyColumnDefaults.padding(
@@ -57,7 +59,7 @@ fun DataCollectionScreen(
     )
 
     LaunchedEffect(Unit) {
-        homeVM.setup(ctx, patientId)
+        ecgVM.setup(ctx, patientId)
     }
 
     ScalingLazyColumn(
@@ -69,15 +71,15 @@ fun DataCollectionScreen(
 
         item {
 
-            val title = when(homeUIState.value) {
-                is EcgUIState.Setup -> (homeUIState.value as EcgUIState.Setup).message
-                is EcgUIState.Default -> (homeUIState.value as EcgUIState.Default).message
-                is EcgUIState.Tracking -> (homeUIState.value as EcgUIState.Tracking).message
-                is EcgUIState.Error -> (homeUIState.value as EcgUIState.Error).message
-                is EcgUIState.StopTracking -> (homeUIState.value as EcgUIState.StopTracking).message
-                is EcgUIState.SavingOnDB -> (homeUIState.value as EcgUIState.SavingOnDB).message
-                is EcgUIState.SendingToRemote -> (homeUIState.value as EcgUIState.SendingToRemote).message
-                is EcgUIState.Complete -> (homeUIState.value as EcgUIState.Complete).message
+            val title = when(ecgUIState.value) {
+                is EcgUIState.Setup -> (ecgUIState.value as EcgUIState.Setup).message
+                is EcgUIState.Default -> (ecgUIState.value as EcgUIState.Default).message
+                is EcgUIState.Tracking -> (ecgUIState.value as EcgUIState.Tracking).message
+                is EcgUIState.Error -> (ecgUIState.value as EcgUIState.Error).message
+                is EcgUIState.StopTracking -> (ecgUIState.value as EcgUIState.StopTracking).message
+                is EcgUIState.SavingOnDB -> (ecgUIState.value as EcgUIState.SavingOnDB).message
+                is EcgUIState.SendingToRemote -> (ecgUIState.value as EcgUIState.SendingToRemote).message
+                is EcgUIState.Complete -> (ecgUIState.value as EcgUIState.Complete).message
             }
 
             Column(
@@ -91,7 +93,7 @@ fun DataCollectionScreen(
                     color = MaterialTheme.colors.primary
                 )
 
-                if (homeUIState.value is EcgUIState.Tracking) {
+                if (ecgUIState.value is EcgUIState.Tracking) {
                     Text(
                         modifier = modifier,
                         text = "${countdown.value / 1000}s",
@@ -104,7 +106,7 @@ fun DataCollectionScreen(
         }
 
         item {
-            when (homeUIState.value) {
+            when (ecgUIState.value) {
 
                 is EcgUIState.Default -> {
                     Button(
@@ -113,7 +115,7 @@ fun DataCollectionScreen(
                             backgroundColor = MaterialTheme.colors.secondary
                         ),
                         onClick = {
-                            homeVM.startTracking()
+                            ecgVM.startTracking()
                         },
                         imageVector = Icons.Default.PlayArrow,
                         contentDescription = "Start data collect"
@@ -127,7 +129,7 @@ fun DataCollectionScreen(
                             backgroundColor = MaterialTheme.colors.secondary
                         ),
                         onClick = {
-                            homeVM.stopTracking()
+                            ecgVM.stopTracking()
                         },
                         imageVector = Icons.Default.Close,
                         contentDescription = "Stop data collect"
@@ -142,7 +144,7 @@ fun DataCollectionScreen(
                                 backgroundColor = MaterialTheme.colors.error
                             ),
                             onClick = {
-                                homeVM.resetSetup()
+                                ecgVM.resetSetup()
                             },
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Clear Data"
@@ -154,7 +156,7 @@ fun DataCollectionScreen(
                                 backgroundColor = MaterialTheme.colors.secondary
                             ),
                             onClick = {
-                                homeVM.saveOnDatabase()
+                                ecgVM.saveOnDatabase()
                             },
                             imageVector = Icons.Default.Check,
                             contentDescription = "Save data"
@@ -187,7 +189,7 @@ fun DataCollectionScreen(
                         label = "Try again",
                         colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
                         onClick = {
-                            homeVM.setup(ctx, patientId)
+                            ecgVM.setup(ctx, patientId)
                         }
                     )
                 }
@@ -202,10 +204,10 @@ fun DataCollectionScreen(
                         )
 
                         Chip(
-                            label = "Restart",
+                            label = "ECG Measurement Finished",
                             colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
                             onClick = {
-                                homeVM.setup(ctx, patientId)
+                                navController.navigate("select_patient")
                             }
                         )
                     }

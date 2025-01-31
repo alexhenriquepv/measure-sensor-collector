@@ -6,12 +6,8 @@ import br.concy.demo.TAG
 import br.concy.demo.model.entity.EcgMeasurement
 import br.concy.demo.model.repository.EcgRepository
 import br.concy.demo.model.request.EcgRequest
-import com.samsung.android.service.health.tracking.ConnectionListener
 import com.samsung.android.service.health.tracking.HealthTracker
-import com.samsung.android.service.health.tracking.HealthTrackerException
-import com.samsung.android.service.health.tracking.HealthTrackingService
 import com.samsung.android.service.health.tracking.data.DataPoint
-import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,9 +35,6 @@ class EcgManager(
     private val scope: CoroutineScope
 ) {
 
-    private lateinit var htService: HealthTrackingService
-    private lateinit var ecgTracker: HealthTracker
-
     private val _countdownTime = MutableStateFlow(COUNTDOWN_DEFAULT)
     private val _ecgBuffer = mutableListOf<Float>()
 
@@ -50,6 +43,11 @@ class EcgManager(
     private var patientId = 0
 
     private val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
+
+    private val shc = SamsungHealthConnection(
+        successCallback = { onServiceConnection() },
+        errorCallback = { onError("Fail on Samsung Health Connection") }
+    )
 
     private val ecgListener = object : HealthTracker.TrackerEventListener {
         override fun onDataReceived(list: List<DataPoint>) {
@@ -83,30 +81,6 @@ class EcgManager(
 
     fun setPatientId(id: Int) {
         patientId = id
-    }
-
-    fun setupSamsungConnection(context: Context) {
-        val samsungConnectionListener = object : ConnectionListener {
-
-            override fun onConnectionSuccess() {
-                Log.d(TAG, "Health data service is connected")
-                ecgTracker = htService.getHealthTracker(HealthTrackerType.ECG_ON_DEMAND)
-                onServiceConnection()
-            }
-
-            override fun onConnectionEnded() {
-                Log.d(TAG, "Health data service is disconnected")
-            }
-
-            override fun onConnectionFailed(e: HealthTrackerException) {
-                Log.e(TAG, "Conn Failed reason: " + e.errorCode)
-                onError("Fail on Samsung Health Connection")
-            }
-        }
-
-        Log.d(TAG, "Setting up Health data service..")
-        htService = HealthTrackingService(samsungConnectionListener, context)
-        htService.connectService()
     }
 
     suspend fun saveOnDatabase() {
@@ -173,11 +147,9 @@ class EcgManager(
     }
 
     fun startTracking() {
-        if (this::ecgTracker.isInitialized) {
-            Log.d(TAG, "startTracking")
-            ecgTracker.setEventListener(ecgListener)
-            onStartTracking()
-        }
+        Log.d(TAG, "startTracking")
+        shc.ecgTracker.setEventListener(ecgListener)
+        onStartTracking()
     }
 
     fun stopTracking() {
@@ -187,13 +159,17 @@ class EcgManager(
         countdownJob = null
 
         onStopTracking(_ecgBuffer.size)
-        ecgTracker.unsetEventListener()
+        shc.ecgTracker.unsetEventListener()
 
         if (_ecgBuffer.size == 0) {
             resetSetup()
         } else {
             Log.d(TAG, "measurements count: ${_ecgBuffer.size}")
         }
+    }
+
+    fun startSetup(context: Context) {
+        shc.setup(context)
     }
 
     fun resetSetup() {
@@ -203,10 +179,6 @@ class EcgManager(
         runBlocking {
             ecgRepository.deleteAll()
         }
-    }
-
-    fun isInitialized(): Boolean {
-        return this::ecgTracker.isInitialized
     }
 
     companion object {

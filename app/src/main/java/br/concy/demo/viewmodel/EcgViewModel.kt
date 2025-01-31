@@ -20,7 +20,7 @@ class EcgViewModel @Inject constructor(
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<EcgUIState>(
-        EcgUIState.Default("Start data collect")
+        EcgUIState.Setup()
     )
 
     val uiState = _uiState.asStateFlow()
@@ -59,13 +59,9 @@ class EcgViewModel @Inject constructor(
     val countdown = ecgManager.countdown
 
     fun setup(context: Context, patientId: Int) {
-        if (ecgManager.isInitialized()) {
-            _uiState.value = EcgUIState.Default()
-        } else {
-            ecgManager.setPatientId(patientId)
-            _uiState.value = EcgUIState.Setup()
-            ecgManager.setupSamsungConnection(context)
-        }
+        ecgManager.setPatientId(patientId)
+        _uiState.value = EcgUIState.Setup()
+        ecgManager.startSetup(context)
     }
 
     fun startTracking() {
