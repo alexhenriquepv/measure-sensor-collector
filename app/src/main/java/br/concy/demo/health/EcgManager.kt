@@ -3,8 +3,9 @@ package br.concy.demo.health
 import android.content.Context
 import android.util.Log
 import br.concy.demo.model.entity.EcgMeasurement
-import br.concy.demo.model.request.EcgRequest
 import br.concy.demo.model.repository.EcgRepository
+import br.concy.demo.model.request.EcgRequest
+import br.concy.demo.model.response.EcgResponse
 import br.concy.demo.viewmodel.DataCollectionViewModel.Companion.TAG
 import com.samsung.android.service.health.tracking.ConnectionListener
 import com.samsung.android.service.health.tracking.HealthTracker
@@ -14,12 +15,15 @@ import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.HealthTrackerType
 import com.samsung.android.service.health.tracking.data.ValueKey
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -47,7 +51,7 @@ class EcgManager(
     private var countdownJob: Job? = null
     private var patientId = 0
 
-    private val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    private val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
 
     private val ecgListener = object : HealthTracker.TrackerEventListener {
         override fun onDataReceived(list: List<DataPoint>) {
@@ -116,8 +120,8 @@ class EcgManager(
             val formattedDate = sdf.format(date)
 
             EcgMeasurement(
-                value = item,
-                datetime = formattedDate
+                measurement = item,
+                registered_at = formattedDate
             )
         }
 
@@ -130,23 +134,27 @@ class EcgManager(
         Log.d(TAG, "sentToRemote - Patient ID: $patientId")
         onSendingToRemote()
 
-        try {
-            val measurements = ecgRepository.getAll()
+        val measurements = ecgRepository.getAll()
 
-            val requestData = EcgRequest(
-                patient_id = patientId,
-                measurements = measurements
-            )
+        val requestData = EcgRequest(
+            patient_id = patientId,
+            measurements = measurements
+        )
 
-            val res = apiService.sendRegister(requestData)
-            Log.d(TAG, res.message)
-            onComplete()
-        } catch (e: Exception) {
-            Log.e(TAG, "Fail: $e")
-            onError("${e.message}")
+        scope.launch(Dispatchers.IO) {
+            try {
+                val res = apiService.sendRegister(requestData)
+                Log.d(TAG, res.message)
+                onComplete()
+            } catch (e: Exception) {
+                if (e is HttpException) {
+                    Log.d(TAG, e.message())
+                    onError(e.message())
+                }
+            }
+
+            resetSetup()
         }
-
-        resetSetup()
     }
 
     fun startCountdown() {

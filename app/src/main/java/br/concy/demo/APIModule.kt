@@ -3,6 +3,7 @@ package br.concy.demo
 import android.content.Context
 import br.concy.demo.health.EcgAPIService
 import br.concy.demo.health.HeartRateAPIService
+import br.concy.demo.util.ConfigLoader
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,9 +18,11 @@ import javax.inject.Singleton
 class APIModule {
     @Singleton
     @Provides
-    fun provideRetrofit(): Retrofit {
+    fun provideRetrofit(@ApplicationContext context: Context): Retrofit {
+        val config = ConfigLoader.loadConfig(context)
+        val baseUrl = config?.base_url ?: "http://localhost:8000/api/"
         return Retrofit.Builder()
-            .baseUrl("http://10.224.1.28/Sistema-Embarcado-de-Aquisicao-de-Sinais-de-ECG/Model_Web_IA_Arritmias/backend/API/")
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

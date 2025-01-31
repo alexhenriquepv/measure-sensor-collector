@@ -193,13 +193,22 @@ fun DataCollectionScreen(
                 }
 
                 is DataCollectionUIState.Complete -> {
-                    Chip(
-                        label = "Restart",
-                        colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
-                        onClick = {
-                            homeVM.setup(ctx, patientId)
-                        }
-                    )
+                    Column {
+                        Text(
+                            modifier = modifier.padding(bottom = 8.dp),
+                            text = DataCollectionUIState.Complete().message,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colors.primary
+                        )
+
+                        Chip(
+                            label = "Restart",
+                            colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
+                            onClick = {
+                                homeVM.setup(ctx, patientId)
+                            }
+                        )
+                    }
                 }
 
                 else -> {}

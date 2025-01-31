@@ -51,7 +51,7 @@ class DataCollectionViewModel @Inject constructor(
             _uiState.value = DataCollectionUIState.SendingToRemote()
         },
         onComplete = {
-            _uiState.value = DataCollectionUIState.Complete()
+            _uiState.value = DataCollectionUIState.Complete("The data was sent to server.")
         },
         scope = viewModelScope
     )

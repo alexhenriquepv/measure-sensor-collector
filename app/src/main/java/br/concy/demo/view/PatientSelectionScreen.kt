@@ -2,6 +2,7 @@ package br.concy.demo.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -56,12 +57,12 @@ fun PatientSelectionScreen(navController: NavController) {
             is PatientSelectionUIState.Default -> {
                 items(items = patients.value) { item ->
                     Chip(
-                        label = "${item.id_patient}: ${item.name}",
+                        label = "${item.id}: ${item.name}",
                         colors = ChipDefaults.chipColors(
                             backgroundColor = MaterialTheme.colors.surface
                         ),
                         onClick = {
-                            navController.navigate("data_collection?patient_id=${item.id_patient}")
+                            navController.navigate("data_collection?patient_id=${item.id}")
                         }
                     )
                 }
@@ -79,21 +80,24 @@ fun PatientSelectionScreen(navController: NavController) {
             }
             else -> {
                 item {
-                    Text(
-                        text = "Fail to fetch patients data.",
-                        color = MaterialTheme.colors.error,
-                        fontSize = 16.sp
-                    )
-
-                    Chip(
-                        label = "Try again",
-                        onClick = {
-                            patientsVM.getPatients()
-                        },
-                        colors = ChipDefaults.chipColors(
-                            backgroundColor = MaterialTheme.colors.surface
+                    Column {
+                        Text(
+                            modifier = Modifier.padding(bottom = 5.dp),
+                            text = "Fail to fetch patients data.",
+                            color = MaterialTheme.colors.error,
+                            fontSize = 16.sp,
                         )
-                    )
+
+                        Chip(
+                            label = "Try again",
+                            onClick = {
+                                patientsVM.getPatients()
+                            },
+                            colors = ChipDefaults.chipColors(
+                                backgroundColor = MaterialTheme.colors.surface
+                            )
+                        )
+                    }
                 }
             }
         }

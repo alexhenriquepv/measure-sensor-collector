@@ -9,11 +9,11 @@ import retrofit2.http.POST
 
 interface EcgAPIService {
 
-    @POST("insert_ecg_smartwatch.php")
+    @POST("ecg/multiple")
     suspend fun sendRegister(
         @Body data: EcgRequest
     ) : EcgResponse
 
-    @GET("get_patients.php")
+    @GET("patients")
     suspend fun getPatients(): List<Patient>
 }
