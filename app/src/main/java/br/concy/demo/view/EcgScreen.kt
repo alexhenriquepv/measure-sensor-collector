@@ -28,7 +28,7 @@ import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.ProgressIndicatorDefaults
 import br.concy.demo.uistate.EcgUIState
-import br.concy.demo.viewmodel.DataCollectionViewModel
+import br.concy.demo.viewmodel.EcgViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
@@ -44,7 +44,7 @@ fun DataCollectionScreen(
 ) {
 
     val ctx = LocalContext.current
-    val homeVM: DataCollectionViewModel = hiltViewModel()
+    val homeVM: EcgViewModel = hiltViewModel()
     val homeUIState = homeVM.uiState.collectAsState()
     val countdown = homeVM.countdown.collectAsState()
 

@@ -2,10 +2,10 @@ package br.concy.demo.health
 
 import android.content.Context
 import android.util.Log
+import br.concy.demo.TAG
 import br.concy.demo.model.entity.EcgMeasurement
 import br.concy.demo.model.repository.EcgRepository
 import br.concy.demo.model.request.EcgRequest
-import br.concy.demo.viewmodel.DataCollectionViewModel.Companion.TAG
 import com.samsung.android.service.health.tracking.ConnectionListener
 import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.HealthTrackerException

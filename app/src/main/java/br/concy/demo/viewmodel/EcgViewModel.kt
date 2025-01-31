@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DataCollectionViewModel @Inject constructor(
+class EcgViewModel @Inject constructor(
     apiService: EcgAPIService,
     ecgRepository: EcgRepository
 ): ViewModel() {
@@ -85,9 +85,5 @@ class DataCollectionViewModel @Inject constructor(
     fun resetSetup() {
         ecgManager.resetSetup()
         _uiState.value = EcgUIState.Default()
-    }
-
-    companion object {
-        const val TAG = "Arrhythmias"
     }
 }

@@ -22,4 +22,4 @@ class MainApp: Application(), Configuration.Provider {
             .build()
 }
 
-const val TAG = "Demo Sensor App"
+const val TAG = "Sensor App"
