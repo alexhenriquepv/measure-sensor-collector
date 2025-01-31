@@ -27,7 +27,7 @@ import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.ProgressIndicatorDefaults
-import br.concy.demo.uistate.DataCollectionUIState
+import br.concy.demo.uistate.EcgUIState
 import br.concy.demo.viewmodel.DataCollectionViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
@@ -70,14 +70,14 @@ fun DataCollectionScreen(
         item {
 
             val title = when(homeUIState.value) {
-                is DataCollectionUIState.Setup -> (homeUIState.value as DataCollectionUIState.Setup).message
-                is DataCollectionUIState.Default -> (homeUIState.value as DataCollectionUIState.Default).message
-                is DataCollectionUIState.Tracking -> (homeUIState.value as DataCollectionUIState.Tracking).message
-                is DataCollectionUIState.Error -> (homeUIState.value as DataCollectionUIState.Error).message
-                is DataCollectionUIState.StopTracking -> (homeUIState.value as DataCollectionUIState.StopTracking).message
-                is DataCollectionUIState.SavingOnDB -> (homeUIState.value as DataCollectionUIState.SavingOnDB).message
-                is DataCollectionUIState.SendingToRemote -> (homeUIState.value as DataCollectionUIState.SendingToRemote).message
-                is DataCollectionUIState.Complete -> (homeUIState.value as DataCollectionUIState.Complete).message
+                is EcgUIState.Setup -> (homeUIState.value as EcgUIState.Setup).message
+                is EcgUIState.Default -> (homeUIState.value as EcgUIState.Default).message
+                is EcgUIState.Tracking -> (homeUIState.value as EcgUIState.Tracking).message
+                is EcgUIState.Error -> (homeUIState.value as EcgUIState.Error).message
+                is EcgUIState.StopTracking -> (homeUIState.value as EcgUIState.StopTracking).message
+                is EcgUIState.SavingOnDB -> (homeUIState.value as EcgUIState.SavingOnDB).message
+                is EcgUIState.SendingToRemote -> (homeUIState.value as EcgUIState.SendingToRemote).message
+                is EcgUIState.Complete -> (homeUIState.value as EcgUIState.Complete).message
             }
 
             Column(
@@ -91,7 +91,7 @@ fun DataCollectionScreen(
                     color = MaterialTheme.colors.primary
                 )
 
-                if (homeUIState.value is DataCollectionUIState.Tracking) {
+                if (homeUIState.value is EcgUIState.Tracking) {
                     Text(
                         modifier = modifier,
                         text = "${countdown.value / 1000}s",
@@ -106,7 +106,7 @@ fun DataCollectionScreen(
         item {
             when (homeUIState.value) {
 
-                is DataCollectionUIState.Default -> {
+                is EcgUIState.Default -> {
                     Button(
                         modifier = Modifier.padding(top = 8.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -120,7 +120,7 @@ fun DataCollectionScreen(
                     )
                 }
 
-                is DataCollectionUIState.Tracking -> {
+                is EcgUIState.Tracking -> {
                     Button(
                         modifier = Modifier.padding(top = 8.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -134,7 +134,7 @@ fun DataCollectionScreen(
                     )
                 }
 
-                is DataCollectionUIState.StopTracking -> {
+                is EcgUIState.StopTracking -> {
                     Row {
                         Button(
                             modifier = Modifier.padding(top = 8.dp, end = 16.dp),
@@ -162,7 +162,7 @@ fun DataCollectionScreen(
                     }
                 }
 
-                is DataCollectionUIState.SavingOnDB -> {
+                is EcgUIState.SavingOnDB -> {
                     CircularProgressIndicator(
                         modifier = Modifier.fillMaxSize().padding(all = 1.dp),
                         startAngle = 295.5f,
@@ -172,7 +172,7 @@ fun DataCollectionScreen(
                     )
                 }
 
-                is DataCollectionUIState.SendingToRemote -> {
+                is EcgUIState.SendingToRemote -> {
                     CircularProgressIndicator(
                         modifier = Modifier.fillMaxSize().padding(all = 1.dp),
                         startAngle = 295.5f,
@@ -182,7 +182,7 @@ fun DataCollectionScreen(
                     )
                 }
 
-                is DataCollectionUIState.Error -> {
+                is EcgUIState.Error -> {
                     Chip(
                         label = "Try again",
                         colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
@@ -192,11 +192,11 @@ fun DataCollectionScreen(
                     )
                 }
 
-                is DataCollectionUIState.Complete -> {
+                is EcgUIState.Complete -> {
                     Column {
                         Text(
                             modifier = modifier.padding(bottom = 8.dp),
-                            text = DataCollectionUIState.Complete().message,
+                            text = EcgUIState.Complete().message,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colors.primary
                         )

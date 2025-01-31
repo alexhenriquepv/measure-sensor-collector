@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import br.concy.demo.health.EcgAPIService
 import br.concy.demo.health.EcgManager
 import br.concy.demo.model.repository.EcgRepository
-import br.concy.demo.uistate.DataCollectionUIState
+import br.concy.demo.uistate.EcgUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,8 +19,8 @@ class DataCollectionViewModel @Inject constructor(
     ecgRepository: EcgRepository
 ): ViewModel() {
 
-    private val _uiState = MutableStateFlow<DataCollectionUIState>(
-        DataCollectionUIState.Default("Start data collect")
+    private val _uiState = MutableStateFlow<EcgUIState>(
+        EcgUIState.Default("Start data collect")
     )
 
     val uiState = _uiState.asStateFlow()
@@ -29,29 +29,29 @@ class DataCollectionViewModel @Inject constructor(
         apiService,
         ecgRepository,
         onError = { message: String ->
-            _uiState.value = DataCollectionUIState.Error(message)
+            _uiState.value = EcgUIState.Error(message)
         },
         onServiceConnection = {
-            _uiState.value = DataCollectionUIState.Default()
+            _uiState.value = EcgUIState.Default()
         },
         onStartTracking = {
-            _uiState.value = DataCollectionUIState.Tracking()
+            _uiState.value = EcgUIState.Tracking()
         },
         onStopTracking = { itemsCount ->
             if (itemsCount > 0) {
-                _uiState.value = DataCollectionUIState.StopTracking("Collected count: $itemsCount")
+                _uiState.value = EcgUIState.StopTracking("Collected count: $itemsCount")
             } else {
-                _uiState.value = DataCollectionUIState.Default()
+                _uiState.value = EcgUIState.Default()
             }
         },
         onSavingOnDB = {
-            _uiState.value = DataCollectionUIState.SavingOnDB()
+            _uiState.value = EcgUIState.SavingOnDB()
         },
         onSendingToRemote = {
-            _uiState.value = DataCollectionUIState.SendingToRemote()
+            _uiState.value = EcgUIState.SendingToRemote()
         },
         onComplete = {
-            _uiState.value = DataCollectionUIState.Complete("The data was sent to server.")
+            _uiState.value = EcgUIState.Complete("The data was sent to server.")
         },
         scope = viewModelScope
     )
@@ -60,10 +60,10 @@ class DataCollectionViewModel @Inject constructor(
 
     fun setup(context: Context, patientId: Int) {
         if (ecgManager.isInitialized()) {
-            _uiState.value = DataCollectionUIState.Default()
+            _uiState.value = EcgUIState.Default()
         } else {
             ecgManager.setPatientId(patientId)
-            _uiState.value = DataCollectionUIState.Setup()
+            _uiState.value = EcgUIState.Setup()
             ecgManager.setupSamsungConnection(context)
         }
     }
@@ -84,7 +84,7 @@ class DataCollectionViewModel @Inject constructor(
 
     fun resetSetup() {
         ecgManager.resetSetup()
-        _uiState.value = DataCollectionUIState.Default()
+        _uiState.value = EcgUIState.Default()
     }
 
     companion object {

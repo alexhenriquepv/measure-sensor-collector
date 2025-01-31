@@ -3,10 +3,6 @@
 
     <uses-feature android:name="android.hardware.type.watch" />
     <uses-permission android:name="android.permission.BODY_SENSORS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
@@ -37,22 +33,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".health.PassiveDataService"
-            android:permission="com.google.android.wearable.healthservices.permission.PASSIVE_DATA_BINDING"
-            android:exported="true" />
-
-        <service
-            android:name=".health.MeasureDataService"
-            android:permission="com.google.android.wearable.healthservices.permission.PASSIVE_DATA_BINDING"
-            android:foregroundServiceType="health"
-            android:enabled="true"
-            android:exported="true" />
-
-        <meta-data
-            android:name="com.samsung.android.health.permission.read"
-            android:value="com.samsung.health.step_count" />
 
     </application>
 

@@ -2,7 +2,6 @@ package br.concy.demo
 
 import android.content.Context
 import br.concy.demo.health.EcgAPIService
-import br.concy.demo.health.HeartRateAPIService
 import br.concy.demo.util.ConfigLoader
 import dagger.Module
 import dagger.Provides
@@ -25,12 +24,6 @@ class APIModule {
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-    }
-
-    @Singleton
-    @Provides
-    fun provideHeartRateApiService(retrofit: Retrofit): HeartRateAPIService {
-        return retrofit.create(HeartRateAPIService::class.java)
     }
 
     @Singleton

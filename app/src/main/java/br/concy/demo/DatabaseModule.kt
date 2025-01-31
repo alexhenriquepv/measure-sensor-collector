@@ -3,9 +3,7 @@ package br.concy.demo
 import android.content.Context
 import br.concy.demo.model.InventoryDatabase
 import br.concy.demo.model.dao.EcgMeasurementDao
-import br.concy.demo.model.dao.HeartHateMeasurementDao
 import br.concy.demo.model.repository.EcgRepository
-import br.concy.demo.model.repository.HeartRateRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,14 +19,6 @@ class DatabaseModule {
     fun provideInventoryDatabase(@ApplicationContext context: Context): InventoryDatabase {
         return InventoryDatabase.getDatabase(context)
     }
-
-    @Singleton
-    @Provides
-    fun providesHeartHateDao(database: InventoryDatabase) = database.heartHateMeasurementDao()
-
-    @Singleton
-    @Provides
-    fun provideHeartHateRepository(dao: HeartHateMeasurementDao) = HeartRateRepository(dao)
 
     @Singleton
     @Provides
