@@ -5,7 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import br.concy.demo.model.dao.AccelMeasurementDao
 import br.concy.demo.model.dao.EcgMeasurementDao
+import br.concy.demo.model.entity.AccelMeasurement
 import br.concy.demo.model.entity.EcgMeasurement
 import br.concy.demo.util.Converters
 
@@ -13,13 +15,15 @@ import br.concy.demo.util.Converters
     version = 1,
     exportSchema = false,
     entities = [
-        EcgMeasurement::class
+        EcgMeasurement::class,
+        AccelMeasurement::class
     ]
 )
 @TypeConverters(Converters::class)
 abstract class InventoryDatabase: RoomDatabase() {
 
     abstract fun ecgMeasurementDao(): EcgMeasurementDao
+    abstract fun accelMeasurementDao(): AccelMeasurementDao
 
     companion object {
 
