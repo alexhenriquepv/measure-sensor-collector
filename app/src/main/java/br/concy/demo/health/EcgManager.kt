@@ -5,7 +5,6 @@ import android.util.Log
 import br.concy.demo.model.entity.EcgMeasurement
 import br.concy.demo.model.repository.EcgRepository
 import br.concy.demo.model.request.EcgRequest
-import br.concy.demo.model.response.EcgResponse
 import br.concy.demo.viewmodel.DataCollectionViewModel.Companion.TAG
 import com.samsung.android.service.health.tracking.ConnectionListener
 import com.samsung.android.service.health.tracking.HealthTracker
@@ -22,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -121,7 +119,7 @@ class EcgManager(
 
             EcgMeasurement(
                 measurement = item,
-                registered_at = formattedDate
+                registeredAt = formattedDate
             )
         }
 
@@ -137,7 +135,7 @@ class EcgManager(
         val measurements = ecgRepository.getAll()
 
         val requestData = EcgRequest(
-            patient_id = patientId,
+            patientId = patientId,
             measurements = measurements
         )
 

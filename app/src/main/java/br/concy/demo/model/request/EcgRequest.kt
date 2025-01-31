@@ -1,9 +1,10 @@
 package br.concy.demo.model.request
 
 import br.concy.demo.model.entity.EcgMeasurement
-import java.util.Date
+import com.google.gson.annotations.SerializedName
 
 data class EcgRequest(
-    val patient_id: Int,
+    @SerializedName("patient_id")
+    val patientId: Int,
     val measurements: List<EcgMeasurement>
 )

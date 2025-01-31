@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "ecg_measurements")
 data class EcgMeasurement(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val registered_at: String,
+    val registeredAt: String,
     val measurement: Float,
 )
