@@ -4,13 +4,16 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "ecg_measurements")
-data class EcgMeasurement(
-
+@Entity(tableName = "gyro_measurements")
+data class GyroscopeMeasurement(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    @SerializedName("patient_id")
+    @SerializedName("registered_at")
     val registeredAt: String,
-    val measurement: Float,
+
+    val x: Float,
+    val y: Float,
+    val z: Float,
+    var sync: Boolean = false
 )

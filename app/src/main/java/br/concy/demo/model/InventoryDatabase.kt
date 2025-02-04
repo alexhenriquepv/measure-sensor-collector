@@ -7,8 +7,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import br.concy.demo.model.dao.AccelMeasurementDao
 import br.concy.demo.model.dao.EcgMeasurementDao
+import br.concy.demo.model.dao.GyroMeasurementDao
 import br.concy.demo.model.entity.AccelMeasurement
 import br.concy.demo.model.entity.EcgMeasurement
+import br.concy.demo.model.entity.GyroscopeMeasurement
 import br.concy.demo.util.Converters
 
 @Database(
@@ -16,7 +18,8 @@ import br.concy.demo.util.Converters
     exportSchema = false,
     entities = [
         EcgMeasurement::class,
-        AccelMeasurement::class
+        AccelMeasurement::class,
+        GyroscopeMeasurement::class
     ]
 )
 @TypeConverters(Converters::class)
@@ -24,6 +27,7 @@ abstract class InventoryDatabase: RoomDatabase() {
 
     abstract fun ecgMeasurementDao(): EcgMeasurementDao
     abstract fun accelMeasurementDao(): AccelMeasurementDao
+    abstract fun gyroMeasurementDao(): GyroMeasurementDao
 
     companion object {
 

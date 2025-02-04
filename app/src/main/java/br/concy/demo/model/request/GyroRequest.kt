@@ -1,10 +1,10 @@
 package br.concy.demo.model.request
 
-import br.concy.demo.model.entity.AccelMeasurement
+import br.concy.demo.model.entity.GyroscopeMeasurement
 import com.google.gson.annotations.SerializedName
 
-data class AccelRequest(
+data class GyroRequest(
     @SerializedName("patient_id")
     val patientId: Int,
-    val measurements: List<AccelMeasurement>
+    val measurements: List<GyroscopeMeasurement>
 )
