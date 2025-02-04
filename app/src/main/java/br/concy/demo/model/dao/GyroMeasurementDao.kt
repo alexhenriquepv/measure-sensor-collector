@@ -13,7 +13,7 @@ interface GyroMeasurementDao {
     suspend fun insert(item: GyroscopeMeasurement)
 
     @Query("DELETE FROM gyro_measurements WHERE sync = true")
-    suspend fun deleteSynced()
+    suspend fun deleteSynced(): Int
 
     @Query("SELECT * FROM gyro_measurements WHERE sync = false")
     suspend fun getNotSynced(): List<GyroscopeMeasurement>

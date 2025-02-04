@@ -13,7 +13,7 @@ interface AccelMeasurementDao {
     suspend fun insert(item: AccelMeasurement)
 
     @Query("DELETE FROM accel_measurements WHERE sync = true")
-    suspend fun deleteSynced()
+    suspend fun deleteSynced(): Int
 
     @Query("SELECT * FROM accel_measurements WHERE sync = false")
     suspend fun getNotSynced(): List<AccelMeasurement>

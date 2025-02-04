@@ -10,7 +10,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock
@@ -19,10 +18,14 @@ import androidx.core.app.NotificationCompat
 import br.concy.demo.R
 import br.concy.demo.TAG
 import br.concy.demo.model.entity.AccelMeasurement
+import br.concy.demo.model.entity.GyroscopeMeasurement
 import br.concy.demo.model.repository.AccelRepository
+import br.concy.demo.model.repository.GyroRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -36,17 +39,23 @@ class SensorsService: Service(), SensorEventListener {
     private lateinit var accelerometer: Sensor
     private lateinit var gyroscope: Sensor
     private lateinit var wakeLock: WakeLock
+    private lateinit var bufferJob: Job
 
     private lateinit var sharedPreferences: SharedPreferences
 
     private val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
-    private var lastUpdateTime = 0L
-    private val delay = 1000L
-    private val CHANNEL_ID = "sensor_service_channel"
+    private val samplingFrequency = 1000L
+    private val channelId = "sensor_service_channel"
     private val notificationId = 111
+
+    private val accelBuffer = mutableListOf<AccelMeasurement>()
+    private val gyroBuffer = mutableListOf<GyroscopeMeasurement>()
 
     @Inject
     lateinit var accelRepository: AccelRepository
+
+    @Inject
+    lateinit var gyroRepository: GyroRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -80,7 +89,7 @@ class SensorsService: Service(), SensorEventListener {
 
         createNotificationChannel()
 
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Sensors Service")
             .setContentText("Sensors are running in the background.")
             .setSmallIcon(R.drawable.baseline_monitor_heart_24)
@@ -88,6 +97,7 @@ class SensorsService: Service(), SensorEventListener {
             .build()
 
         startForeground(notificationId, notification)
+        startBufferJob()
 
         Log.d(TAG, "onCreate::SensorsService")
     }
@@ -103,39 +113,28 @@ class SensorsService: Service(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         event.let {
 
-            val currentTime = System.currentTimeMillis()
+            val date = Date()
 
-            if (currentTime - lastUpdateTime > delay) {
-                val date = Date()
-
-                when(it.sensor.type) {
-                    Sensor.TYPE_ACCELEROMETER -> {
-                        val accelMeasurement = AccelMeasurement(
-                            x = it.values[0],
-                            y = it.values[1],
-                            z = it.values[2],
-                            registeredAt = sdf.format(date)
-                        )
-
-                        try {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                accelRepository.insert(accelMeasurement)
-                                Log.d(TAG, "Inserted new accel measurement")
-                            }
-                        } catch (e: Exception) {
-                            Log.e(TAG, e.message.toString())
-                        }
-                    }
-                    Sensor.TYPE_GYROSCOPE -> {
-                        val x = it.values[0]
-                        val y = it.values[1]
-                        val z = it.values[2]
-                        Log.d(TAG, "Gyroscope: x=$x, y=$y, z=$z")
-                    }
-                    else -> {}
+            when(it.sensor.type) {
+                Sensor.TYPE_ACCELEROMETER -> {
+                    val accelMeasurement = AccelMeasurement(
+                        x = it.values[0],
+                        y = it.values[1],
+                        z = it.values[2],
+                        registeredAt = sdf.format(date)
+                    )
+                    accelBuffer.add(accelMeasurement)
                 }
-
-                lastUpdateTime = currentTime
+                Sensor.TYPE_GYROSCOPE -> {
+                    val gyroMeasurement = GyroscopeMeasurement(
+                        x = it.values[0],
+                        y = it.values[1],
+                        z = it.values[2],
+                        registeredAt = sdf.format(date)
+                    )
+                    gyroBuffer.add(gyroMeasurement)
+                }
+                else -> {}
             }
         }
     }
@@ -144,9 +143,25 @@ class SensorsService: Service(), SensorEventListener {
         Log.d(TAG, "${sensor.name} precision: $accuracy")
     }
 
+    override fun onDestroy() {
+
+        super.onDestroy()
+
+        sensorManager.unregisterListener(this)
+        bufferJob.cancel()
+        sharedPreferences.edit().putBoolean("isRunning", false).apply()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+
+        if (wakeLock.isHeld) {
+            wakeLock.release()
+        }
+
+        Log.d(TAG, "onDestroy::SensorsService")
+    }
+
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
-            CHANNEL_ID,
+            channelId,
             "Sensor Service",
             NotificationManager.IMPORTANCE_DEFAULT
         )
@@ -154,15 +169,40 @@ class SensorsService: Service(), SensorEventListener {
         notificationManager.createNotificationChannel(channel)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        sensorManager.unregisterListener(this)
-        sharedPreferences.edit().putBoolean("isRunning", false).apply()
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        if (wakeLock.isHeld) {
-            wakeLock.release()
+    private fun startBufferJob() {
+        bufferJob = CoroutineScope(Dispatchers.IO).launch {
+            while (true) {
+                processBuffer()
+                delay(samplingFrequency)
+            }
+        }
+    }
+
+    private fun processBuffer() {
+        if (accelBuffer.isNotEmpty()) {
+            val accelMeasurement = accelBuffer.last()
+            try {
+                CoroutineScope(Dispatchers.IO).launch {
+                    accelRepository.insert(accelMeasurement)
+                    Log.d(TAG, "Inserted new accel measurement")
+                    accelBuffer.clear()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, e.message.toString())
+            }
         }
 
-        Log.d(TAG, "onDestroy::SensorsService")
+        if (gyroBuffer.isNotEmpty()) {
+            val gyroMeasurement = gyroBuffer.last()
+            try {
+                CoroutineScope(Dispatchers.IO).launch {
+                    gyroRepository.insert(gyroMeasurement)
+                    Log.d(TAG, "Inserted new gyro measurement")
+                    gyroBuffer.clear()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, e.message.toString())
+            }
+        }
     }
 }

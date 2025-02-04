@@ -69,14 +69,30 @@ fun SensorsScreen(
             modifier = modifier,
             text = text,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.secondary,
-            fontSize = 12.sp
+            color = when(uiState.value) {
+                is SensorsUIState.Default -> {
+                    MaterialTheme.colors.primary
+                }
+
+                is SensorsUIState.Tracking -> {
+                    MaterialTheme.colors.secondary
+                }
+            },
+            fontSize = 16.sp
         )
 
         Button(
             modifier = Modifier.padding(top = 8.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondary
+                backgroundColor = when(uiState.value) {
+                    is SensorsUIState.Default -> {
+                        MaterialTheme.colors.primary
+                    }
+
+                    is SensorsUIState.Tracking -> {
+                        MaterialTheme.colors.secondary
+                    }
+                },
             ),
             onClick = {
                 when(uiState.value) {
