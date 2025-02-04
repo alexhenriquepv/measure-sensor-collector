@@ -16,7 +16,6 @@ class SamsungHealthConnection(
 
     private lateinit var htService: HealthTrackingService
     lateinit var ecgTracker: HealthTracker
-    lateinit var accelTracker: HealthTracker
 
     fun setup(context: Context) {
         val samsungConnectionListener = object : ConnectionListener {
@@ -24,7 +23,6 @@ class SamsungHealthConnection(
             override fun onConnectionSuccess() {
                 Log.d(TAG, "Health data service is connected")
                 ecgTracker = htService.getHealthTracker(HealthTrackerType.ECG_ON_DEMAND)
-                accelTracker = htService.getHealthTracker(HealthTrackerType.ACCELEROMETER_CONTINUOUS)
                 successCallback()
             }
 

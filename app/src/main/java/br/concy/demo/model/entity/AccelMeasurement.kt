@@ -9,5 +9,6 @@ data class AccelMeasurement(
     val registeredAt: String,
     val x: Float,
     val y: Float,
-    val z: Float
+    val z: Float,
+    var sync: Boolean = false
 )

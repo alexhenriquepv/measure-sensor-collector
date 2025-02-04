@@ -43,7 +43,7 @@ fun ServiceSelectionScreen(
         columnState = listState,
     ) {
         item {
-            ListHeader { Text(text = "Select a Service", fontSize = 20.sp) }
+            ListHeader { Text(text = "Select a Service", fontSize = 16.sp) }
         }
 
         items(items = services) { item ->

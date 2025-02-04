@@ -8,6 +8,7 @@ class AccelRepository @Inject constructor(
     private val dao: AccelMeasurementDao
 ) {
     suspend fun insert(item: AccelMeasurement) = dao.insert(item)
-    suspend fun deleteAll() = dao.deleteAll()
-    suspend fun getAll() = dao.getAll()
+    suspend fun deleteSynced() = dao.deleteSynced()
+    suspend fun getNotSynced() = dao.getNotSynced()
+    suspend fun updateAll(items: List<AccelMeasurement>) = dao.updateAll(items)
 }

@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SensorsViewModel @Inject constructor(
-    private val application: Application
+    application: Application
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<SensorsUIState>(
@@ -28,7 +28,7 @@ class SensorsViewModel @Inject constructor(
 
     fun startTracking(context: Context) {
         val intent = Intent(context, SensorsService::class.java)
-        context.startService(intent)
+        context.startForegroundService(intent)
         _uiState.value = SensorsUIState.Tracking()
     }
 

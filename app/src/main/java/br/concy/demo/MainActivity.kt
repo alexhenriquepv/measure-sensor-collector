@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import br.concy.demo.ui.theme.DemoTheme
 import br.concy.demo.view.AppNavigation
 import br.concy.demo.view.PermissionDeniedPage
 import br.concy.demo.viewmodel.PermissionViewModel
+import br.concy.demo.viewmodel.SetupViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
