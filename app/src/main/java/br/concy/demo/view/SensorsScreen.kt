@@ -1,20 +1,24 @@
 package br.concy.demo.view
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.MaterialTheme
 import br.concy.demo.uistate.SensorsUIState
@@ -27,7 +31,6 @@ import com.google.android.horologist.compose.material.Button
 fun SensorsScreen(
     modifier: Modifier = Modifier,
     patientId: Int,
-    navController: NavController
 ) {
     val ctx = LocalContext.current
     val vm: SensorsViewModel = hiltViewModel()
@@ -51,7 +54,13 @@ fun SensorsScreen(
         vm.checkServiceStatus()
     }
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             modifier = modifier,
             text = text,
@@ -75,7 +84,14 @@ fun SensorsScreen(
                     }
                 }
             },
-            imageVector = Icons.Default.PlayArrow,
+            imageVector = when(uiState.value) {
+                is SensorsUIState.Default -> {
+                    Icons.Default.PlayArrow
+                }
+                is SensorsUIState.Tracking -> {
+                    Icons.Default.Close
+                }
+            },
             contentDescription = btnText
         )
     }

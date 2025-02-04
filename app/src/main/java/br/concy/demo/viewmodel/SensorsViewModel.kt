@@ -1,6 +1,5 @@
 package br.concy.demo.viewmodel
 
-import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -8,10 +7,12 @@ import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import br.concy.demo.health.SensorsService
 import br.concy.demo.uistate.SensorsUIState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
+@HiltViewModel
 class SensorsViewModel @Inject constructor(
     private val application: Application
 ): ViewModel() {

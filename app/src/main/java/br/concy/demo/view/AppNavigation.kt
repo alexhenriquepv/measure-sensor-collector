@@ -20,6 +20,18 @@ fun AppNavigation() {
         }
 
         composable(
+            route = "select_service?patient_id={patient_id}",
+            arguments = listOf(
+                navArgument("patient_id") {
+                    type = NavType.IntType
+                }
+            )
+        ) { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getInt("patient_id") ?: 0
+            ServiceSelectionScreen(navController = navController, patientId = patientId)
+        }
+
+        composable(
             route = "ecg?patient_id={patient_id}",
             arguments = listOf(
                 navArgument("patient_id") {
@@ -40,7 +52,7 @@ fun AppNavigation() {
             )
         ) { backStackEntry ->
             val patientId = backStackEntry.arguments?.getInt("patient_id") ?: 0
-            EcgScreen(patientId = patientId, navController = navController)
+            SensorsScreen(patientId = patientId)
         }
     }
 }

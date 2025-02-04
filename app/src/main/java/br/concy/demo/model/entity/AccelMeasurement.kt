@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class AccelMeasurement(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val registeredAt: String,
-    val x: Int,
-    val y: Int,
-    val z: Int
+    val x: Float,
+    val y: Float,
+    val z: Float
 )

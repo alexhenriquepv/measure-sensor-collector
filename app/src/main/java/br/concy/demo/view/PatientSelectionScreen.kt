@@ -62,7 +62,7 @@ fun PatientSelectionScreen(navController: NavController) {
                             backgroundColor = MaterialTheme.colors.surface
                         ),
                         onClick = {
-                            navController.navigate("ecg?patient_id=${item.id}")
+                            navController.navigate("select_service?patient_id=${item.id}")
                         }
                     )
                 }
@@ -96,6 +96,17 @@ fun PatientSelectionScreen(navController: NavController) {
                             colors = ChipDefaults.chipColors(
                                 backgroundColor = MaterialTheme.colors.surface
                             )
+                        )
+
+                        Chip(
+                            modifier = Modifier.padding(top = 8.dp),
+                            label = "Sample user",
+                            colors = ChipDefaults.chipColors(
+                                backgroundColor = MaterialTheme.colors.surface
+                            ),
+                            onClick = {
+                                navController.navigate("select_service?patient_id=0")
+                            }
                         )
                     }
                 }
