@@ -62,7 +62,7 @@ fun PatientSelectionScreen(navController: NavController) {
                             backgroundColor = MaterialTheme.colors.surface
                         ),
                         onClick = {
-                            navController.navigate("data_collection?patient_id=${item.id}")
+                            navController.navigate("ecg?patient_id=${item.id}")
                         }
                     )
                 }

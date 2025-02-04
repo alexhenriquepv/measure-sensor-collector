@@ -39,7 +39,7 @@ import com.google.android.horologist.compose.material.Chip
 
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
-fun DataCollectionScreen(
+fun EcgScreen(
     modifier: Modifier = Modifier,
     patientId: Int,
     navController: NavController

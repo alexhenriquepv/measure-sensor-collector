@@ -12,7 +12,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import br.concy.demo.ui.theme.DemoTheme
 import br.concy.demo.view.AppNavigation
-import br.concy.demo.view.DataCollectionScreen
 import br.concy.demo.view.PermissionDeniedPage
 import br.concy.demo.viewmodel.PermissionViewModel
 import dagger.hilt.android.AndroidEntryPoint
