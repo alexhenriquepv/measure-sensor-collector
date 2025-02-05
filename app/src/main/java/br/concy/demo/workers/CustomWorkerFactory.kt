@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
+import br.concy.demo.health.APIService
 import br.concy.demo.model.repository.AccelRepository
 import br.concy.demo.model.repository.GyroRepository
 import javax.inject.Inject
@@ -14,7 +15,8 @@ import javax.inject.Singleton
 class CustomWorkerFactory @Inject constructor(
     private val workerFactory: HiltWorkerFactory,
     private val accelRepository: AccelRepository,
-    private val gyroRepository: GyroRepository
+    private val gyroRepository: GyroRepository,
+    private val apiService: APIService
 ) : WorkerFactory() {
 
     override fun createWorker(
@@ -36,7 +38,8 @@ class CustomWorkerFactory @Inject constructor(
                     appContext,
                     workerParameters,
                     accelRepository,
-                    gyroRepository
+                    gyroRepository,
+                    apiService
                 )
             }
             else -> {

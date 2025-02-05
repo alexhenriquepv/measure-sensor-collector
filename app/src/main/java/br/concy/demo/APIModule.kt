@@ -1,7 +1,7 @@
 package br.concy.demo
 
 import android.content.Context
-import br.concy.demo.health.EcgAPIService
+import br.concy.demo.health.APIService
 import br.concy.demo.util.ConfigLoader
 import dagger.Module
 import dagger.Provides
@@ -28,7 +28,7 @@ class APIModule {
 
     @Singleton
     @Provides
-    fun provideEcgApiService(retrofit: Retrofit): EcgAPIService {
-        return retrofit.create(EcgAPIService::class.java)
+    fun provideEcgApiService(retrofit: Retrofit): APIService {
+        return retrofit.create(APIService::class.java)
     }
 }

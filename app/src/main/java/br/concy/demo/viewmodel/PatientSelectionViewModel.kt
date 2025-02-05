@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.concy.demo.TAG
-import br.concy.demo.health.EcgAPIService
+import br.concy.demo.health.APIService
 import br.concy.demo.model.entity.Patient
 import br.concy.demo.uistate.PatientSelectionUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PatientSelectionViewModel @Inject constructor(
-    private val ecgAPIService: EcgAPIService
+    private val APIService: APIService
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<PatientSelectionUIState>(
@@ -35,7 +35,7 @@ class PatientSelectionViewModel @Inject constructor(
         _uiState.value = PatientSelectionUIState.Loading()
         viewModelScope.launch {
             try {
-                val res = ecgAPIService.getPatients()
+                val res = APIService.getPatients()
                 _patients.value = res
                 _uiState.value = PatientSelectionUIState.Default()
             } catch (err: Exception) {

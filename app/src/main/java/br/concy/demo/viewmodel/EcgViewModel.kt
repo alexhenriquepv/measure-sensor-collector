@@ -3,7 +3,7 @@ package br.concy.demo.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.concy.demo.health.EcgAPIService
+import br.concy.demo.health.APIService
 import br.concy.demo.health.EcgManager
 import br.concy.demo.model.repository.EcgRepository
 import br.concy.demo.uistate.EcgUIState
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EcgViewModel @Inject constructor(
-    apiService: EcgAPIService,
+    apiService: APIService,
     ecgRepository: EcgRepository
 ): ViewModel() {
 

@@ -23,7 +23,7 @@ import java.util.Date
 import java.util.Locale
 
 class EcgManager(
-    private val apiService: EcgAPIService,
+    private val apiService: APIService,
     private val ecgRepository: EcgRepository,
     private val onError: (message: String) -> Unit,
     private val onServiceConnection: () -> Unit,
@@ -115,7 +115,7 @@ class EcgManager(
 
         scope.launch(Dispatchers.IO) {
             try {
-                val res = apiService.sendRegister(requestData)
+                val res = apiService.sendEcgData(requestData)
                 Log.d(TAG, res.message)
                 onComplete()
             } catch (e: Exception) {
