@@ -5,9 +5,13 @@ import br.concy.demo.model.InventoryDatabase
 import br.concy.demo.model.dao.AccelMeasurementDao
 import br.concy.demo.model.dao.EcgMeasurementDao
 import br.concy.demo.model.dao.GyroMeasurementDao
+import br.concy.demo.model.dao.HrMeasurementDao
+import br.concy.demo.model.dao.IbiMeasurementDao
 import br.concy.demo.model.repository.AccelRepository
 import br.concy.demo.model.repository.EcgRepository
 import br.concy.demo.model.repository.GyroRepository
+import br.concy.demo.model.repository.HrRepository
+import br.concy.demo.model.repository.IbiRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,4 +52,20 @@ class DatabaseModule {
     @Singleton
     @Provides
     fun provideGyroRepository(dao: GyroMeasurementDao) = GyroRepository(dao)
+
+    @Singleton
+    @Provides
+    fun providesHrMeasurementDao(database: InventoryDatabase) = database.hrMeasurementDao()
+
+    @Singleton
+    @Provides
+    fun providesHrRepository(dao: HrMeasurementDao) = HrRepository(dao)
+
+    @Singleton
+    @Provides
+    fun providesIbiMeasurementDao(database: InventoryDatabase) = database.ibiMeasurementDao()
+
+    @Singleton
+    @Provides
+    fun providesIbiRepository(dao: IbiMeasurementDao) = IbiRepository(dao)
 }

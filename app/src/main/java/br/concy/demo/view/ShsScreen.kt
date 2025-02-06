@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,8 +24,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.MaterialTheme
 import br.concy.demo.uistate.SensorsUIState
-import br.concy.demo.viewmodel.SensorsViewModel
-import br.concy.demo.viewmodel.SetupViewModel
 import br.concy.demo.viewmodel.ShsViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.material.Button
