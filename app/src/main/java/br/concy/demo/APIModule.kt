@@ -19,7 +19,7 @@ class APIModule {
     @Provides
     fun provideRetrofit(@ApplicationContext context: Context): Retrofit {
         val config = ConfigLoader.loadConfig(context)
-        val baseUrl = config?.base_url ?: "http://localhost:8000/api/"
+        val baseUrl = config?.baseUrl ?: "http://localhost:8000/api/"
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
