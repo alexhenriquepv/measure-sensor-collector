@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +21,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.CircularProgressIndicator
@@ -40,9 +38,7 @@ import com.google.android.horologist.compose.material.Chip
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun EcgScreen(
-    modifier: Modifier = Modifier,
-    patientId: Int,
-    navController: NavController
+    modifier: Modifier = Modifier
 ) {
 
     val ctx = LocalContext.current
@@ -57,10 +53,6 @@ fun EcgScreen(
         ),
         verticalArrangement = Arrangement.Center,
     )
-
-    LaunchedEffect(Unit) {
-        ecgVM.setup(ctx, patientId)
-    }
 
     ScalingLazyColumn(
         modifier = Modifier
@@ -189,7 +181,7 @@ fun EcgScreen(
                         label = "Try again",
                         colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
                         onClick = {
-                            ecgVM.setup(ctx, patientId)
+                            ecgVM.setup(ctx)
                         }
                     )
                 }
@@ -201,14 +193,6 @@ fun EcgScreen(
                             text = EcgUIState.Complete().message,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colors.primary
-                        )
-
-                        Chip(
-                            label = "ECG Measurement Finished",
-                            colors = ChipDefaults.chipColors(backgroundColor = MaterialTheme.colors.surface),
-                            onClick = {
-                                navController.navigate("select_patient")
-                            }
                         )
                     }
                 }

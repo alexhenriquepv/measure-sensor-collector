@@ -1,8 +1,10 @@
 package br.concy.demo.viewmodel
 
+import android.app.Application
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import br.concy.demo.SHARED_PREFS
 import br.concy.demo.health.APIService
 import br.concy.demo.health.EcgManager
 import br.concy.demo.model.repository.EcgRepository
@@ -16,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EcgViewModel @Inject constructor(
     apiService: APIService,
-    ecgRepository: EcgRepository
+    ecgRepository: EcgRepository,
+    application: Application
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<EcgUIState>(
@@ -24,6 +27,7 @@ class EcgViewModel @Inject constructor(
     )
 
     val uiState = _uiState.asStateFlow()
+    private val prefs = application.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
 
     private val ecgManager = EcgManager(
         apiService,
@@ -53,13 +57,12 @@ class EcgViewModel @Inject constructor(
         onComplete = {
             _uiState.value = EcgUIState.Complete("The data was sent to server.")
         },
-        scope = viewModelScope
+        patientId = prefs.getInt("patientId", 0)
     )
 
     val countdown = ecgManager.countdown
 
-    fun setup(context: Context, patientId: Int) {
-        ecgManager.setPatientId(patientId)
+    fun setup(context: Context) {
         _uiState.value = EcgUIState.Setup()
         ecgManager.startSetup(context)
     }

@@ -32,7 +32,7 @@ class EcgManager(
     private val onSavingOnDB: () -> Unit,
     private val onSendingToRemote: () -> Unit,
     private val onComplete: () -> Unit,
-    private val scope: CoroutineScope
+    private val patientId: Int
 ) {
 
     private val _countdownTime = MutableStateFlow(COUNTDOWN_DEFAULT)
@@ -40,7 +40,6 @@ class EcgManager(
 
     val countdown = _countdownTime.asStateFlow()
     private var countdownJob: Job? = null
-    private var patientId = 0
 
     private val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
 
@@ -79,10 +78,6 @@ class EcgManager(
         }
     }
 
-    fun setPatientId(id: Int) {
-        patientId = id
-    }
-
     suspend fun saveOnDatabase() {
         Log.d(TAG, "saveOnDatabase")
         onSavingOnDB()
@@ -98,7 +93,6 @@ class EcgManager(
         }
 
         ecgRepository.insertAll(measurements)
-
         sentToRemote()
     }
 
@@ -113,7 +107,7 @@ class EcgManager(
             measurements = measurements
         )
 
-        scope.launch(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 val res = apiService.sendEcgData(requestData)
                 Log.d(TAG, res.message)
@@ -134,7 +128,7 @@ class EcgManager(
             Log.d(TAG, "Countdown already running")
         } else {
             Log.d(TAG, "startCountdown")
-            countdownJob = scope.launch {
+            countdownJob = CoroutineScope(Dispatchers.Main).launch {
                 while (_countdownTime.value > 0) {
                     delay(DURATION)
                     _countdownTime.value -= DURATION
@@ -169,7 +163,7 @@ class EcgManager(
     }
 
     fun startSetup(context: Context) {
-        shc.setup(context)
+        shc.connect(context)
     }
 
     fun resetSetup() {

@@ -1,11 +1,9 @@
 package br.concy.demo.view
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 
 @Composable
 fun AppNavigation() {
@@ -13,46 +11,26 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = "select_patient"
+        startDestination = "select-patient"
     ) {
-        composable("select_patient") {
+        composable("select-patient") {
             PatientSelectionScreen(navController)
         }
 
-        composable(
-            route = "select_service?patient_id={patient_id}",
-            arguments = listOf(
-                navArgument("patient_id") {
-                    type = NavType.IntType
-                }
-            )
-        ) { backStackEntry ->
-            val patientId = backStackEntry.arguments?.getInt("patient_id") ?: 0
-            ServiceSelectionScreen(navController = navController, patientId = patientId)
+        composable(route = "select-service") {
+            ServiceSelectionScreen(navController)
         }
 
-        composable(
-            route = "ecg?patient_id={patient_id}",
-            arguments = listOf(
-                navArgument("patient_id") {
-                    type = NavType.IntType
-                }
-            )
-        ) { backStackEntry ->
-            val patientId = backStackEntry.arguments?.getInt("patient_id") ?: 0
-            EcgScreen(patientId = patientId, navController = navController)
+        composable(route = "samsung-ecg") {
+            EcgScreen()
         }
 
-        composable(
-            route = "sensors?patient_id={patient_id}",
-            arguments = listOf(
-                navArgument("patient_id") {
-                    type = NavType.IntType
-                }
-            )
-        ) { backStackEntry ->
-            val patientId = backStackEntry.arguments?.getInt("patient_id") ?: 0
-            SensorsScreen(patientId = patientId)
+        composable(route = "samsung-hr") {
+            ShsScreen()
+        }
+
+        composable(route = "motion-sensors") {
+            MotionSensorsScreen()
         }
     }
 }

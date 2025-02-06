@@ -16,13 +16,15 @@ class SamsungHealthConnection(
 
     private lateinit var htService: HealthTrackingService
     lateinit var ecgTracker: HealthTracker
+    lateinit var hrTracker: HealthTracker
 
-    fun setup(context: Context) {
+    fun connect(context: Context) {
         val samsungConnectionListener = object : ConnectionListener {
 
             override fun onConnectionSuccess() {
                 Log.d(TAG, "Health data service is connected")
                 ecgTracker = htService.getHealthTracker(HealthTrackerType.ECG_ON_DEMAND)
+                hrTracker = htService.getHealthTracker(HealthTrackerType.HEART_RATE_CONTINUOUS)
                 successCallback()
             }
 
@@ -39,5 +41,9 @@ class SamsungHealthConnection(
         Log.d(TAG, "Setting up Health data service..")
         htService = HealthTrackingService(samsungConnectionListener, context)
         htService.connectService()
+    }
+
+    fun disconnect() {
+        htService.disconnectService()
     }
 }

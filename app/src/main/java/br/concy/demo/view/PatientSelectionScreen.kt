@@ -62,7 +62,9 @@ fun PatientSelectionScreen(navController: NavController) {
                             backgroundColor = MaterialTheme.colors.surface
                         ),
                         onClick = {
-                            navController.navigate("select_service?patient_id=${item.id}")
+                            patientsVM.onSelectPatient(item.id) {
+                                navController.navigate("select-service")
+                            }
                         }
                     )
                 }
@@ -105,7 +107,9 @@ fun PatientSelectionScreen(navController: NavController) {
                                 backgroundColor = MaterialTheme.colors.surface
                             ),
                             onClick = {
-                                navController.navigate("select_service?patient_id=0")
+                                patientsVM.onSelectPatient(0) {
+                                    navController.navigate("select-service")
+                                }
                             }
                         )
                     }

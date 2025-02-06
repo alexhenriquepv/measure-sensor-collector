@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import br.concy.demo.SHARED_PREFS
 import br.concy.demo.TAG
 import br.concy.demo.health.APIService
 import br.concy.demo.model.repository.AccelRepository
@@ -23,6 +24,8 @@ class SyncRemoteWorker @AssistedInject constructor(
     private val apiService: APIService
 ) : CoroutineWorker(context, workerParameters) {
 
+    private val prefs = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+
     /*
         Sent not synced registers to remote service.
         Mark this registers as synced.
@@ -33,7 +36,7 @@ class SyncRemoteWorker @AssistedInject constructor(
             Log.d(TAG, "Accel to sync: ${notSyncedAccel.size}.")
 
             val accelRequest = AccelRequest(
-                patientId = 1,
+                patientId = prefs.getInt("patientId", 0),
                 measurements = notSyncedAccel
             )
 
@@ -53,7 +56,7 @@ class SyncRemoteWorker @AssistedInject constructor(
             Log.d(TAG, "Gyro to sync: ${notSyncedGyro.size}.")
 
             val gyroRequest = GyroRequest(
-                patientId = 1,
+                patientId = prefs.getInt("patientId", 0),
                 measurements = notSyncedGyro
             )
 

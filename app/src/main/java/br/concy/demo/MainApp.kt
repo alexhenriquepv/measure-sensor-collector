@@ -24,3 +24,4 @@ class MainApp: Application(), Configuration.Provider {
 }
 
 const val TAG = "Sensor App"
+const val SHARED_PREFS = "SensorServiceState"

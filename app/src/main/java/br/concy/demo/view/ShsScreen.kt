@@ -1,5 +1,7 @@
 package br.concy.demo.view
 
+import android.app.Activity
+import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,18 +27,19 @@ import androidx.wear.compose.material.MaterialTheme
 import br.concy.demo.uistate.SensorsUIState
 import br.concy.demo.viewmodel.SensorsViewModel
 import br.concy.demo.viewmodel.SetupViewModel
+import br.concy.demo.viewmodel.ShsViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.material.Button
 
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
-fun SensorsScreen(
+fun ShsScreen(
     modifier: Modifier = Modifier,
-    patientId: Int,
 ) {
     val ctx = LocalContext.current
-    val vm: SensorsViewModel = hiltViewModel()
-    val setupVM: SetupViewModel = hiltViewModel()
+    val activity = ctx as Activity
+
+    val vm: ShsViewModel = hiltViewModel()
     val uiState = vm.uiState.collectAsState()
 
     var text = ""
@@ -43,19 +47,17 @@ fun SensorsScreen(
 
     when(uiState.value) {
         is SensorsUIState.Default -> {
-            text = "Sensors Inactivated"
-            btnText = "Start Service"
+            text = "SHS Inactivated"
+            btnText = "Start Collect"
         }
         is SensorsUIState.Tracking -> {
-            text = "Sensors Activated"
-            btnText = "Stop Service"
+            text = "SHS Activated"
+            btnText = "Stop Collect"
         }
     }
 
     LaunchedEffect(Unit) {
         vm.checkServiceStatus()
-        setupVM.scheduleSyncRemoteWorker(ctx)
-        setupVM.scheduleClearSyncedRemoteWorker(ctx)
     }
 
     Column(
@@ -98,9 +100,11 @@ fun SensorsScreen(
                 when(uiState.value) {
                     is SensorsUIState.Default -> {
                         vm.startTracking(ctx)
+                        activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     }
                     is SensorsUIState.Tracking -> {
                         vm.stopTracking(ctx)
+                        activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     }
                 }
             },

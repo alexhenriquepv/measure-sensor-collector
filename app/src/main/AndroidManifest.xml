@@ -42,6 +42,7 @@
         </activity>
 
         <service android:name=".health.SensorsService" android:foregroundServiceType="health" />
+        <service android:name=".health.ShsService" android:foregroundServiceType="health" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

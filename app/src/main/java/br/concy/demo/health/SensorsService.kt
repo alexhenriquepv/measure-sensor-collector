@@ -12,6 +12,7 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock
 import android.util.Log
+import br.concy.demo.SHARED_PREFS
 import br.concy.demo.TAG
 import br.concy.demo.model.entity.AccelMeasurement
 import br.concy.demo.model.entity.GyroscopeMeasurement
@@ -79,7 +80,7 @@ class SensorsService: Service(), SensorEventListener {
             )
         }
 
-        sharedPreferences = getSharedPreferences("SensorServiceState", Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
         sharedPreferences.edit().putBoolean("isRunning", true).apply()
 
         val notification = NotificationHelper.createNotification(this)

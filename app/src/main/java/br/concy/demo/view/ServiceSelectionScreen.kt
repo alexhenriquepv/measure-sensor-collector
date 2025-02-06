@@ -22,8 +22,7 @@ import com.google.android.horologist.compose.material.Chip
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun ServiceSelectionScreen(
-    navController: NavController,
-    patientId: Int,
+    navController: NavController
 ) {
 
     val listState = rememberResponsiveColumnState(
@@ -34,7 +33,7 @@ fun ServiceSelectionScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     )
 
-    val services = listOf("ecg", "sensors")
+    val services = ServiceType.entries
 
     ScalingLazyColumn(
         modifier = Modifier
@@ -48,18 +47,24 @@ fun ServiceSelectionScreen(
 
         items(items = services) { item ->
             Chip(
-                label = item,
+                label = item.serviceName,
                 colors = ChipDefaults.chipColors(
                     backgroundColor = MaterialTheme.colors.surface
                 ),
                 onClick = {
-                    if (item == "ecg") {
-                        navController.navigate("ecg?patient_id=$patientId")
-                    } else {
-                        navController.navigate("sensors?patient_id=$patientId")
+                    when (item) {
+                        ServiceType.SamsungECG -> navController.navigate("samsung-ecg")
+                        ServiceType.SamsungHR -> navController.navigate("samsung-hr")
+                        ServiceType.MotionSensors -> navController.navigate("motion-sensors")
                     }
                 }
             )
         }
     }
+}
+
+enum class ServiceType(val serviceName: String) {
+    SamsungECG("Samsung ECG"),
+    SamsungHR("Samsung HR"),
+    MotionSensors("Motion Sensors")
 }
