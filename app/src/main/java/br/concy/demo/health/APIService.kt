@@ -4,9 +4,13 @@ import br.concy.demo.model.entity.Patient
 import br.concy.demo.model.request.AccelRequest
 import br.concy.demo.model.request.EcgRequest
 import br.concy.demo.model.request.GyroRequest
+import br.concy.demo.model.request.HrRequest
+import br.concy.demo.model.request.IbiRequest
 import br.concy.demo.model.response.AccelResponse
 import br.concy.demo.model.response.EcgResponse
 import br.concy.demo.model.response.GyroResponse
+import br.concy.demo.model.response.HrResponse
+import br.concy.demo.model.response.IbiResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -30,4 +34,14 @@ interface APIService {
     suspend fun sendGyroData(
         @Body data: GyroRequest
     ) : GyroResponse
+
+    @POST("heart-rate/multiple")
+    suspend fun sendHrData(
+        @Body data: HrRequest
+    ) : HrResponse
+
+    @POST("ibi/multiple")
+    suspend fun sendIbiData(
+        @Body data: IbiRequest
+    ) : IbiResponse
 }

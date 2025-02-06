@@ -4,15 +4,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.ListHeader
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import br.concy.demo.viewmodel.SetupViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
@@ -25,6 +29,9 @@ fun ServiceSelectionScreen(
     navController: NavController
 ) {
 
+    val ctx = LocalContext.current
+    val setupVM: SetupViewModel = hiltViewModel()
+
     val listState = rememberResponsiveColumnState(
         contentPadding = ScalingLazyColumnDefaults.padding(
             first = ScalingLazyColumnDefaults.ItemType.Chip,
@@ -34,6 +41,11 @@ fun ServiceSelectionScreen(
     )
 
     val services = ServiceType.entries
+
+    LaunchedEffect(Unit) {
+        setupVM.scheduleSyncRemoteWorker(ctx)
+        setupVM.scheduleClearSyncedRemoteWorker(ctx)
+    }
 
     ScalingLazyColumn(
         modifier = Modifier

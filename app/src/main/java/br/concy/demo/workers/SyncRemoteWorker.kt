@@ -10,8 +10,12 @@ import br.concy.demo.TAG
 import br.concy.demo.health.APIService
 import br.concy.demo.model.repository.AccelRepository
 import br.concy.demo.model.repository.GyroRepository
+import br.concy.demo.model.repository.HrRepository
+import br.concy.demo.model.repository.IbiRepository
 import br.concy.demo.model.request.AccelRequest
 import br.concy.demo.model.request.GyroRequest
+import br.concy.demo.model.request.HrRequest
+import br.concy.demo.model.request.IbiRequest
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -21,6 +25,8 @@ class SyncRemoteWorker @AssistedInject constructor(
     @Assisted workerParameters: WorkerParameters,
     private val accelRepository: AccelRepository,
     private val gyroRepository: GyroRepository,
+    private val hrRepository: HrRepository,
+    private val ibiRepository: IbiRepository,
     private val apiService: APIService
 ) : CoroutineWorker(context, workerParameters) {
 
@@ -70,14 +76,56 @@ class SyncRemoteWorker @AssistedInject constructor(
         }
     }
 
+    private suspend fun syncHrData() {
+        val notSyncedHR = hrRepository.getNotSynced()
+        if (notSyncedHR.isNotEmpty()) {
+            Log.d(TAG, "HR to sync: ${notSyncedHR.size}.")
+
+            val hrRequest = HrRequest(
+                patientId = prefs.getInt("patientId", 0),
+                measurements = notSyncedHR
+            )
+
+            val res = apiService.sendHrData(hrRequest)
+            Log.d(TAG, res.message)
+
+            notSyncedHR.forEach { it.sync = true }
+            hrRepository.updateAll(notSyncedHR)
+        } else {
+            Log.d(TAG, "HR already synced")
+        }
+    }
+
+    private suspend fun syncIbiData() {
+        val notSyncedIbi = ibiRepository.getNotSynced()
+        if (notSyncedIbi.isNotEmpty()) {
+            Log.d(TAG, "IBI to sync: ${notSyncedIbi.size}.")
+
+            val ibiRequest = IbiRequest(
+                patientId = prefs.getInt("patientId", 0),
+                measurements = notSyncedIbi
+            )
+
+            val res = apiService.sendIbiData(ibiRequest)
+            Log.d(TAG, res.message)
+
+            notSyncedIbi.forEach { it.sync = true }
+            ibiRepository.updateAll(notSyncedIbi)
+        } else {
+            Log.d(TAG, "IBI already synced")
+        }
+    }
+
     override suspend fun doWork(): Result {
         try {
             syncAccelData()
             syncGyroData()
+            syncHrData()
+            syncIbiData()
             return Result.success()
         } catch (e: Exception) {
             Log.e(TAG, e.message.toString())
-            return Result.retry()
+            return Result.failure()
         }
     }
 }

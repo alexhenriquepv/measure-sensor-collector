@@ -23,7 +23,6 @@ import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.MaterialTheme
 import br.concy.demo.uistate.SensorsUIState
 import br.concy.demo.viewmodel.SensorsViewModel
-import br.concy.demo.viewmodel.SetupViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.material.Button
 
@@ -34,7 +33,6 @@ fun MotionSensorsScreen(
 ) {
     val ctx = LocalContext.current
     val vm: SensorsViewModel = hiltViewModel()
-    val setupVM: SetupViewModel = hiltViewModel()
     val uiState = vm.uiState.collectAsState()
 
     var text = ""
@@ -53,8 +51,6 @@ fun MotionSensorsScreen(
 
     LaunchedEffect(Unit) {
         vm.checkServiceStatus()
-        setupVM.scheduleSyncRemoteWorker(ctx)
-        setupVM.scheduleClearSyncedRemoteWorker(ctx)
     }
 
     Column(

@@ -8,6 +8,8 @@ import androidx.work.WorkerParameters
 import br.concy.demo.health.APIService
 import br.concy.demo.model.repository.AccelRepository
 import br.concy.demo.model.repository.GyroRepository
+import br.concy.demo.model.repository.HrRepository
+import br.concy.demo.model.repository.IbiRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,6 +18,8 @@ class CustomWorkerFactory @Inject constructor(
     private val workerFactory: HiltWorkerFactory,
     private val accelRepository: AccelRepository,
     private val gyroRepository: GyroRepository,
+    private val hrRepository: HrRepository,
+    private val ibiRepository: IbiRepository,
     private val apiService: APIService
 ) : WorkerFactory() {
 
@@ -30,7 +34,9 @@ class CustomWorkerFactory @Inject constructor(
                     appContext,
                     workerParameters,
                     accelRepository,
-                    gyroRepository
+                    gyroRepository,
+                    hrRepository,
+                    ibiRepository
                 )
             }
             SyncRemoteWorker::class.java.name -> {
@@ -39,6 +45,8 @@ class CustomWorkerFactory @Inject constructor(
                     workerParameters,
                     accelRepository,
                     gyroRepository,
+                    hrRepository,
+                    ibiRepository,
                     apiService
                 )
             }
