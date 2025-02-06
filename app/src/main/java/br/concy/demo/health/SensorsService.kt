@@ -1,7 +1,5 @@
 package br.concy.demo.health
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -14,13 +12,12 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import br.concy.demo.R
 import br.concy.demo.TAG
 import br.concy.demo.model.entity.AccelMeasurement
 import br.concy.demo.model.entity.GyroscopeMeasurement
 import br.concy.demo.model.repository.AccelRepository
 import br.concy.demo.model.repository.GyroRepository
+import br.concy.demo.util.NotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -45,8 +42,6 @@ class SensorsService: Service(), SensorEventListener {
 
     private val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
     private val samplingFrequency = 1000L
-    private val channelId = "sensor_service_channel"
-    private val notificationId = 111
 
     private val accelBuffer = mutableListOf<AccelMeasurement>()
     private val gyroBuffer = mutableListOf<GyroscopeMeasurement>()
@@ -87,16 +82,8 @@ class SensorsService: Service(), SensorEventListener {
         sharedPreferences = getSharedPreferences("SensorServiceState", Context.MODE_PRIVATE)
         sharedPreferences.edit().putBoolean("isRunning", true).apply()
 
-        createNotificationChannel()
-
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Sensors Service")
-            .setContentText("Sensors are running in the background.")
-            .setSmallIcon(R.drawable.baseline_monitor_heart_24)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .build()
-
-        startForeground(notificationId, notification)
+        val notification = NotificationHelper.createNotification(this)
+        startForeground(111, notification)
         startBufferJob()
 
         Log.d(TAG, "onCreate::SensorsService")
@@ -157,16 +144,6 @@ class SensorsService: Service(), SensorEventListener {
         }
 
         Log.d(TAG, "onDestroy::SensorsService")
-    }
-
-    private fun createNotificationChannel() {
-        val channel = NotificationChannel(
-            channelId,
-            "Sensor Service",
-            NotificationManager.IMPORTANCE_DEFAULT
-        )
-        val notificationManager = getSystemService(NotificationManager::class.java)
-        notificationManager.createNotificationChannel(channel)
     }
 
     private fun startBufferJob() {
