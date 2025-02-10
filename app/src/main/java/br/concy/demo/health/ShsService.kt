@@ -18,6 +18,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -28,6 +30,7 @@ class ShsService: Service() {
     private val ibiBuffer = mutableListOf<IbiMeasurement>()
     private val bufferJob = CoroutineScope(Dispatchers.IO)
     private val samplingFrequency = 1000L
+    private val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
 
     @Inject
     lateinit var hrRepository: HrRepository
@@ -59,21 +62,22 @@ class ShsService: Service() {
                     val status = dp.getValue(ValueKey.HeartRateSet.HEART_RATE_STATUS)
                     val hrValue = dp.getValue(ValueKey.HeartRateSet.HEART_RATE)
                     val ibiValues = dp.getValue(ValueKey.HeartRateSet.IBI_LIST)
-
+                    Log.d(TAG, "status ${status}")
                     if (status == 1) {
                         hrBuffer.add(HrMeasurement(
-                            registeredAt = dp.timestamp.toString(),
+                            registeredAt = sdf.format(dp.timestamp),
                             measurement = hrValue
                         ))
                         ibiValues.forEach {
                             ibiBuffer.add(
                                 IbiMeasurement(
-                                registeredAt = dp.timestamp.toString(),
+                                registeredAt = sdf.format(dp.timestamp),
                                 measurement = it
                             )
                             )
                         }
                     }
+
                 }
             }
         }

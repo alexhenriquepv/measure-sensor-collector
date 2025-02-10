@@ -17,7 +17,7 @@ import retrofit2.http.POST
 
 interface APIService {
 
-    @GET("patients")
+    @GET("get_patients.php")
     suspend fun getPatients(): List<Patient>
 
     @POST("ecg/multiple")
@@ -40,7 +40,7 @@ interface APIService {
         @Body data: HrRequest
     ) : HrResponse
 
-    @POST("ibi/multiple")
+    @POST("post_patient_sensors_glicodex.php")
     suspend fun sendIbiData(
         @Body data: IbiRequest
     ) : IbiResponse

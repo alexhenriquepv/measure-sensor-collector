@@ -94,6 +94,7 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.retrofit)
     implementation(libs.gson)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
