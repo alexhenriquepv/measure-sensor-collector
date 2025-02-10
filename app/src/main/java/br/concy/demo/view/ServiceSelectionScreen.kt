@@ -68,6 +68,7 @@ fun ServiceSelectionScreen(
                         ServiceType.SamsungECG -> navController.navigate("samsung-ecg")
                         ServiceType.SamsungHR -> navController.navigate("samsung-hr")
                         ServiceType.MotionSensors -> navController.navigate("motion-sensors")
+                        ServiceType.AudioRecorder -> navController.navigate("audio-recorder")
                     }
                 }
             )
@@ -78,5 +79,6 @@ fun ServiceSelectionScreen(
 enum class ServiceType(val serviceName: String) {
     SamsungECG("Samsung ECG"),
     SamsungHR("Samsung HR"),
-    MotionSensors("Motion Sensors")
+    MotionSensors("Motion Sensors"),
+    AudioRecorder(serviceName = "Audio Recorder")
 }

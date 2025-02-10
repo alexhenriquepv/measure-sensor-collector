@@ -13,18 +13,18 @@ class SetupViewModel @Inject constructor(): ViewModel() {
 
     fun scheduleSyncRemoteWorker(context: Context) {
         val workRequest = PeriodicWorkRequestBuilder<SyncRemoteWorker>(
-            repeatInterval = 1,
-            TimeUnit.HOURS
-        ).setInitialDelay(1, TimeUnit.HOURS).build()
+            repeatInterval = 5,
+            TimeUnit.MINUTES
+        ).setInitialDelay(1, TimeUnit.MINUTES).build()
 
         WorkManager.getInstance(context).enqueue(workRequest)
     }
 
     fun scheduleClearSyncedRemoteWorker(context: Context) {
         val workRequest = PeriodicWorkRequestBuilder<ClearSyncedRemoteWorker>(
-            repeatInterval = 1,
-            TimeUnit.HOURS
-        ).setInitialDelay(90, TimeUnit.MINUTES).build()
+            repeatInterval = 5,
+            TimeUnit.MINUTES
+        ).setInitialDelay(2, TimeUnit.MINUTES).build()
 
         WorkManager.getInstance(context).enqueue(workRequest)
     }

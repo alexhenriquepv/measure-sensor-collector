@@ -11,9 +11,14 @@ import br.concy.demo.model.response.EcgResponse
 import br.concy.demo.model.response.GyroResponse
 import br.concy.demo.model.response.HrResponse
 import br.concy.demo.model.response.IbiResponse
+import br.concy.demo.model.response.RecordResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 
 interface APIService {
 
@@ -44,4 +49,11 @@ interface APIService {
     suspend fun sendIbiData(
         @Body data: IbiRequest
     ) : IbiResponse
+
+    @Multipart
+    @POST("audio/upload")
+    suspend fun uploadAudio(
+        @Part audioFilePart: MultipartBody.Part,
+        @Part bodyDataPart: RequestBody
+    ): RecordResponse
 }
