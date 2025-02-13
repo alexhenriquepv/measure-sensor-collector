@@ -1,10 +1,13 @@
 package br.concy.demo.viewmodel
 
+import android.app.Application
 import android.content.Context
 import android.media.MediaRecorder
+import android.os.Build
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.concy.demo.TAG
@@ -27,7 +30,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AudioRecorderViewModel @Inject constructor(
-    val apiService: APIService
+    val apiService: APIService,
+    application: Application
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<AudioRecorderUIState>(
@@ -36,10 +40,11 @@ class AudioRecorderViewModel @Inject constructor(
 
     val uiState = _uiState.asStateFlow()
 
-    private val filePath = "${Environment.getExternalStorageDirectory()}/audio_recording.3gp"
+    private val filePath = "${application.externalCacheDir}/audio_recording.3gp"
     private lateinit var recorder: MediaRecorder
     private lateinit var audioFile: File
 
+    @RequiresApi(Build.VERSION_CODES.S)
     fun startRecord(context: Context) {
 
         if (!this::recorder.isInitialized) {
@@ -49,7 +54,7 @@ class AudioRecorderViewModel @Inject constructor(
             recorder = MediaRecorder(context).apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
                 setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-                setOutputFormat(MediaRecorder.AudioEncoder.AMR_NB)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
                 setOutputFile(audioFile.absolutePath)
             }
         }
@@ -59,7 +64,7 @@ class AudioRecorderViewModel @Inject constructor(
             recorder.start()
             _uiState.value = AudioRecorderUIState.Recording()
         } catch (e: Exception) {
-            Log.d(TAG, e.message.toString())
+            Log.e(TAG, e.message.toString())
         }
     }
 
@@ -103,11 +108,11 @@ class AudioRecorderViewModel @Inject constructor(
                     audioFilePart = audioFormData,
                     bodyDataPart = bodyFormData
                 )
-                Toast.makeText(context, "File uploaded", Toast.LENGTH_LONG)
+                Toast.makeText(context, "File uploaded", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Log.d(TAG, e.message.toString())
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Fail to upload", Toast.LENGTH_LONG)
+                    Toast.makeText(context, "Fail to upload", Toast.LENGTH_LONG).show()
                 }
             } finally {
                 _uiState.value =  AudioRecorderUIState.Default()

@@ -1,7 +1,9 @@
 package br.concy.demo.view
 
 import android.app.Activity
+import android.os.Build
 import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,11 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.ButtonDefaults
+import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
 import br.concy.demo.R
 import br.concy.demo.uistate.AudioRecorderUIState
@@ -34,6 +38,7 @@ import br.concy.demo.viewmodel.AudioRecorderViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.material.Button
 
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun AudioRecorderScreen() {
@@ -89,13 +94,16 @@ fun AudioRecorderScreen() {
             if (uiState.value is AudioRecorderUIState.Default) {
                 IconButton(
                     modifier = Modifier.padding(top = 8.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colors.primary
+                    ),
                     onClick = {
                         activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                         vm.startRecord(ctx)
                     }
                 )  {
                     Icon(
-                        ImageBitmap.imageResource(R.drawable.mic_24),
+                        painter = painterResource(R.drawable.mic_24),
                         contentDescription = "Start Record"
                     )
                 }
@@ -112,7 +120,7 @@ fun AudioRecorderScreen() {
                     }
                 )  {
                     Icon(
-                        ImageBitmap.imageResource(R.drawable.baseline_stop_circle_24),
+                        painter = painterResource(R.drawable.baseline_stop_circle_24),
                         contentDescription = "Stop Record"
                     )
                 }
@@ -132,9 +140,9 @@ fun AudioRecorderScreen() {
                 )
 
                 Button(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 8.dp, start = 12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.onError,
+                        backgroundColor = MaterialTheme.colors.secondary,
                     ),
                     onClick = {
                         vm.clear()
@@ -142,6 +150,10 @@ fun AudioRecorderScreen() {
                     imageVector = Icons.Default.Delete,
                     contentDescription = ""
                 )
+            }
+
+            if (uiState.value is AudioRecorderUIState.Uploading) {
+                CircularProgressIndicator()
             }
         }
     }

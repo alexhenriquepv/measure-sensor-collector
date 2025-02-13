@@ -43,8 +43,8 @@ fun ServiceSelectionScreen(
     val services = ServiceType.entries
 
     LaunchedEffect(Unit) {
-        setupVM.scheduleSyncRemoteWorker(ctx)
-        setupVM.scheduleClearSyncedRemoteWorker(ctx)
+//        setupVM.scheduleSyncRemoteWorker(ctx)
+//        setupVM.scheduleClearSyncedRemoteWorker(ctx)
     }
 
     ScalingLazyColumn(
