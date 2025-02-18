@@ -51,9 +51,10 @@ interface APIService {
     ) : IbiResponse
 
     @Multipart
-    @POST("audio/upload")
+    @POST("upload_audio.php")
     suspend fun uploadAudio(
         @Part audioFilePart: MultipartBody.Part,
-        @Part bodyDataPart: RequestBody
+        @Part("id_patient") patientIdPart: RequestBody,
+        @Part("time_begin") timeBeginPart: RequestBody
     ): RecordResponse
 }

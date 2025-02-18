@@ -1,5 +1,3 @@
-import org.apache.tools.ant.util.JavaEnvUtils.VERSION_11
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -94,6 +92,7 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.retrofit)
     implementation(libs.gson)
+    implementation(libs.logging.interceptor)
 
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)

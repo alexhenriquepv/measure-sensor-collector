@@ -11,20 +11,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.concy.demo.TAG
 import br.concy.demo.health.APIService
-import br.concy.demo.model.entity.AudioRecord
 import br.concy.demo.uistate.AudioRecorderUIState
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,21 +42,17 @@ class AudioRecorderViewModel @Inject constructor(
 
     private val filePath = "${application.externalCacheDir}/audio_recording.3gp"
     private lateinit var recorder: MediaRecorder
-    private lateinit var audioFile: File
+    private val audioFile =  File(filePath)
+    private val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
 
     @RequiresApi(Build.VERSION_CODES.S)
     fun startRecord(context: Context) {
 
-        if (!this::recorder.isInitialized) {
-
-            audioFile = File(filePath)
-
-            recorder = MediaRecorder(context).apply {
-                setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-                setOutputFile(audioFile.absolutePath)
-            }
+        recorder = MediaRecorder(context).apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            setOutputFile(audioFile.absolutePath)
         }
 
         try {
@@ -83,34 +80,30 @@ class AudioRecorderViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
 
-            val requestFile = RequestBody.create(
-                MediaType.get("audio/*"),
-                audioFile
-            )
+            val requestFile = audioFile.asRequestBody("audio/3gp".toMediaType())
 
             val audioFormData = MultipartBody.Part.createFormData(
                 "audio_file",
-                audioFile.name,
+                "${Date().time}_${audioFile.name}",
                 requestFile
             )
 
-            val audioRecord = AudioRecord(0, Date())
-            val bodyJson = Gson().toJson(audioRecord)
-
-            val bodyFormData = RequestBody.create(
-                MediaType.get("application/json"),
-                bodyJson
-            )
+            val patientId = "15".toRequestBody("text/plain".toMediaType())
+            val timeBegin = sdf.format(Date()).toRequestBody("text/plain".toMediaType())
 
             try {
-                apiService.uploadAudio(
+                val res = apiService.uploadAudio(
                     audioFilePart = audioFormData,
-                    bodyDataPart = bodyFormData
+                    patientIdPart = patientId,
+                    timeBeginPart = timeBegin
                 )
-                Toast.makeText(context, "File uploaded", Toast.LENGTH_LONG).show()
-            } catch (e: Exception) {
-                Log.d(TAG, e.message.toString())
                 withContext(Dispatchers.Main) {
+                    Log.d(TAG, res.message)
+                    Toast.makeText(context, "Upload successfully", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Log.d(TAG, e.message.toString())
                     Toast.makeText(context, "Fail to upload", Toast.LENGTH_LONG).show()
                 }
             } finally {

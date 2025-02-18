@@ -7,7 +7,8 @@ import java.io.InputStreamReader
 
 data class Config(
     @SerializedName("base_url")
-    val baseUrl: String
+    val baseUrl: String,
+    val logActive: Boolean
 )
 
 object ConfigLoader {
