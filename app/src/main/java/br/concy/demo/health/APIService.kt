@@ -35,7 +35,7 @@ interface APIService {
         @Body data: GyroRequest
     ) : GyroResponse
 
-    @POST("heart-rate/multiple")
+    @POST("post_patient_sensors_hr.php")
     suspend fun sendHrData(
         @Body data: HrRequest
     ) : HrResponse

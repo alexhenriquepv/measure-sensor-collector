@@ -87,6 +87,7 @@ class SyncRemoteWorker @AssistedInject constructor(
             )
 
             val res = apiService.sendHrData(hrRequest)
+            Log.d(TAG, "tentando fazer requisicao" )
             Log.d(TAG, res.message)
 
             notSyncedHR.forEach { it.sync = true }
@@ -122,7 +123,7 @@ class SyncRemoteWorker @AssistedInject constructor(
         try {
             //syncAccelData()
             //syncGyroData()
-            //syncHrData()
+            syncHrData()
             syncIbiData()
             return Result.success()
         } catch (e: Exception) {
