@@ -24,10 +24,10 @@ class APIModule {
         val config = ConfigLoader.loadConfig(context)
 
         // Define a URL base com prioridade para a carregada da config, mas com fallback duplo
-        val baseUrl = config?.baseUrl ?: "http://10.224.1.56/Sistema-Dashboard-Glicose/"
+        val baseUrl = config?.baseUrl ?: "http://localhost:8000/api"
 
         // Habilita logs apenas se a configuração permitir
-        val logActive = config?.logActive ?: true
+        val logActive = config?.logActive ?: false
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = if (logActive) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         }
