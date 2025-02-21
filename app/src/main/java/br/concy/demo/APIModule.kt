@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -21,17 +22,28 @@ class APIModule {
     @Provides
     fun provideRetrofit(@ApplicationContext context: Context): Retrofit {
         val config = ConfigLoader.loadConfig(context)
+
+        // Define a URL base com prioridade para a carregada da config, mas com fallback duplo
         val baseUrl = config?.baseUrl ?: "http://10.224.1.56/Sistema-Dashboard-Glicose/"
 
-        val logging = HttpLoggingInterceptor()
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY)
+        // Habilita logs apenas se a configuração permitir
+        val logActive = config?.logActive ?: true
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = if (logActive) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+        }
 
-        val client = OkHttpClient.Builder().addInterceptor(logging).build()
+        // Configura o cliente HTTP com interceptador de logs e timeouts
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
 
         return Retrofit.Builder()
             .baseUrl(baseUrl)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
             .build()
     }
 
