@@ -73,9 +73,6 @@ fun PatientSelectionScreen(navController: NavController) {
                 item {
                     CircularProgressIndicator(
                         modifier = Modifier.fillMaxSize().padding(all = 1.dp),
-                        startAngle = 295.5f,
-                        endAngle = 245.5f,
-                        progress = 0.3f,
                         strokeWidth = ProgressIndicatorDefaults.FullScreenStrokeWidth
                     )
                 }

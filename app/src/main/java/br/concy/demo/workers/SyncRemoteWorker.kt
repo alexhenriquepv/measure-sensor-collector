@@ -81,12 +81,11 @@ class SyncRemoteWorker @AssistedInject constructor(
         if (notSyncedHR.isNotEmpty()) {
             Log.d(TAG, "HR to sync: ${notSyncedHR.size}.")
 
-            val hrRequest = HrRequest(
+            val res = apiService.sendHrData(
                 patientId = prefs.getInt("patientId", 0),
                 measurements = notSyncedHR
             )
 
-            val res = apiService.sendHrData(hrRequest)
             Log.d(TAG, res.message)
 
             notSyncedHR.forEach { it.sync = true }

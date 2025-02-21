@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.health.services.client)
     implementation(libs.guava)
     implementation(libs.retrofit)
+    implementation(libs.logging.interceptor)
     implementation(libs.gson)
 
     androidTestImplementation(platform(libs.compose.bom))

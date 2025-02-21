@@ -10,6 +10,7 @@ import br.concy.demo.health.EcgManager
 import br.concy.demo.model.repository.EcgRepository
 import br.concy.demo.uistate.EcgUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -61,6 +62,7 @@ class EcgViewModel @Inject constructor(
     )
 
     val countdown = ecgManager.countdown
+    val electrodeActive = ecgManager.electrodeActive
 
     fun setup(context: Context) {
         _uiState.value = EcgUIState.Setup()
@@ -76,7 +78,7 @@ class EcgViewModel @Inject constructor(
     }
 
     fun saveOnDatabase() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             ecgManager.saveOnDatabase()
         }
     }

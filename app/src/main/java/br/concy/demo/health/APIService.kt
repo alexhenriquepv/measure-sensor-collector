@@ -1,5 +1,7 @@
 package br.concy.demo.health
 
+import br.concy.demo.model.entity.EcgMeasurement
+import br.concy.demo.model.entity.HrMeasurement
 import br.concy.demo.model.entity.Patient
 import br.concy.demo.model.request.AccelRequest
 import br.concy.demo.model.request.EcgRequest
@@ -14,15 +16,17 @@ import br.concy.demo.model.response.IbiResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface APIService {
 
     @GET("patients")
     suspend fun getPatients(): List<Patient>
 
-    @POST("ecg/multiple")
+    @POST("patients/{patientId}/ecg")
     suspend fun sendEcgData(
-        @Body data: EcgRequest
+        @Path("patientId") patientId: Int,
+        @Body measurements: List<EcgMeasurement>
     ) : EcgResponse
 
     @POST("accelerometer/multiple")
@@ -35,9 +39,10 @@ interface APIService {
         @Body data: GyroRequest
     ) : GyroResponse
 
-    @POST("heart-rate/multiple")
+    @POST("patients/{patientId}/hr")
     suspend fun sendHrData(
-        @Body data: HrRequest
+        @Path("patientId") patientId: Int,
+        @Body measurements: List<HrMeasurement>
     ) : HrResponse
 
     @POST("ibi/multiple")

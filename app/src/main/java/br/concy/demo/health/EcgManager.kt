@@ -5,7 +5,6 @@ import android.util.Log
 import br.concy.demo.TAG
 import br.concy.demo.model.entity.EcgMeasurement
 import br.concy.demo.model.repository.EcgRepository
-import br.concy.demo.model.request.EcgRequest
 import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.ValueKey
@@ -36,8 +35,10 @@ class EcgManager(
 ) {
 
     private val _countdownTime = MutableStateFlow(COUNTDOWN_DEFAULT)
+    private val _electrodeActive = MutableStateFlow(false)
     private val _ecgBuffer = mutableListOf<Float>()
 
+    val electrodeActive = _electrodeActive.asStateFlow()
     val countdown = _countdownTime.asStateFlow()
     private var countdownJob: Job? = null
 
@@ -59,10 +60,14 @@ class EcgManager(
                 val leadOff = list[0].getValue(ValueKey.EcgSet.LEAD_OFF)
                 if (leadOff == 5) {
                     Log.e(TAG, "LEAD_OFF")
+                    _electrodeActive.value = false
                 } else {
+                    _electrodeActive.value = true
                     for (dp in list) {
                         val currentECG = dp.getValue(ValueKey.EcgSet.ECG_MV)
-                        _ecgBuffer.add(currentECG)
+                        if (currentECG > 0) {
+                            _ecgBuffer.add(currentECG)
+                        }
                     }
                 }
             }
@@ -102,14 +107,9 @@ class EcgManager(
 
         val measurements = ecgRepository.getAll()
 
-        val requestData = EcgRequest(
-            patientId = patientId,
-            measurements = measurements
-        )
-
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val res = apiService.sendEcgData(requestData)
+                val res = apiService.sendEcgData(patientId, measurements)
                 Log.d(TAG, res.message)
                 onComplete()
             } catch (e: Exception) {
@@ -177,6 +177,6 @@ class EcgManager(
 
     companion object {
         const val DURATION = 1000L
-        const val COUNTDOWN_DEFAULT = 30000L
+        const val COUNTDOWN_DEFAULT = 40000L
     }
 }

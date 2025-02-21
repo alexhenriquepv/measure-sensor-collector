@@ -10,7 +10,9 @@ data class EcgMeasurement(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    @SerializedName("registered_at")
+    @SerializedName("RegisteredAt")
     val registeredAt: String,
+
+    @SerializedName("Value")
     val measurement: Float,
 )

@@ -9,8 +9,10 @@ data class HrMeasurement(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    @SerializedName("registered_at")
+    @SerializedName("RegisteredAt")
     val registeredAt: String,
+
+    @SerializedName("Value")
     val measurement: Int,
     var sync: Boolean = false
 )

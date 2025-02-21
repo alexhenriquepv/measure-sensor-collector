@@ -12,9 +12,11 @@ import br.concy.demo.health.APIService
 import br.concy.demo.model.entity.Patient
 import br.concy.demo.uistate.PatientSelectionUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,14 +43,18 @@ class PatientSelectionViewModel @Inject constructor(
 
     fun getPatients() {
         _uiState.value = PatientSelectionUIState.Loading()
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val res = apiService.getPatients()
                 _patients.value = res
-                _uiState.value = PatientSelectionUIState.Default()
+                withContext(Dispatchers.Main) {
+                    _uiState.value = PatientSelectionUIState.Default()
+                }
             } catch (err: Exception) {
-                Log.e(TAG, err.message.toString())
-                _uiState.value = PatientSelectionUIState.Error(err.message.toString())
+                withContext(Dispatchers.Main) {
+                    Log.e(TAG, err.message.toString())
+                    _uiState.value = PatientSelectionUIState.Error(err.message.toString())
+                }
             }
         }
     }
