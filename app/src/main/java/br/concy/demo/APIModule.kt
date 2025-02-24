@@ -22,12 +22,16 @@ class APIModule {
     @Provides
     fun provideRetrofit(@ApplicationContext context: Context): Retrofit {
         val config = ConfigLoader.loadConfig(context)
-        val baseUrl = config?.baseUrl ?: "http://localhost:8000/api/"
+
+        // Define a URL base com prioridade para a carregada da config, mas com fallback duplo
+        val baseUrl = config?.baseUrl ?: "http://localhost:8000/api"
+
+        // Habilita logs apenas se a configuração permitir
         val logActive = config?.logActive ?: false
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = if (logActive) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         }
-
+        
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)

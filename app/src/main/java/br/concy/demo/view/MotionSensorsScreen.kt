@@ -47,6 +47,7 @@ fun MotionSensorsScreen(
             text = "Sensors Activated"
             btnText = "Stop Service"
         }
+        else -> {}
     }
 
     LaunchedEffect(Unit) {
@@ -72,6 +73,8 @@ fun MotionSensorsScreen(
                 is SensorsUIState.Tracking -> {
                     MaterialTheme.colors.secondary
                 }
+
+                else -> MaterialTheme.colors.primary
             },
             fontSize = 16.sp
         )
@@ -87,6 +90,8 @@ fun MotionSensorsScreen(
                     is SensorsUIState.Tracking -> {
                         MaterialTheme.colors.secondary
                     }
+
+                    else -> MaterialTheme.colors.primary
                 },
             ),
             onClick = {
@@ -97,6 +102,7 @@ fun MotionSensorsScreen(
                     is SensorsUIState.Tracking -> {
                         vm.stopTracking(ctx)
                     }
+                    else -> {}
                 }
             },
             imageVector = when(uiState.value) {
@@ -106,6 +112,8 @@ fun MotionSensorsScreen(
                 is SensorsUIState.Tracking -> {
                     Icons.Default.Close
                 }
+
+                else -> Icons.Default.PlayArrow
             },
             contentDescription = btnText
         )

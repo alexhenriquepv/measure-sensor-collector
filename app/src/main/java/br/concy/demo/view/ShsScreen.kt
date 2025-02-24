@@ -5,11 +5,16 @@ import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +32,7 @@ import br.concy.demo.uistate.SensorsUIState
 import br.concy.demo.viewmodel.ShsViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.material.Button
+import com.google.android.horologist.compose.material.Chip
 
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
@@ -50,6 +56,9 @@ fun ShsScreen(
         is SensorsUIState.Tracking -> {
             text = "SHS Activated"
             btnText = "Stop Collect"
+        }
+        is SensorsUIState.Uploading -> {
+            text = "Uploading data"
         }
     }
 
@@ -76,44 +85,68 @@ fun ShsScreen(
                 is SensorsUIState.Tracking -> {
                     MaterialTheme.colors.secondary
                 }
+
+                else -> MaterialTheme.colors.onSurface
             },
             fontSize = 16.sp
         )
 
-        Button(
-            modifier = Modifier.padding(top = 8.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = when(uiState.value) {
-                    is SensorsUIState.Default -> {
-                        MaterialTheme.colors.primary
-                    }
+        Row(
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                modifier = Modifier.padding(top = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = when(uiState.value) {
+                        is SensorsUIState.Default -> {
+                            MaterialTheme.colors.primary
+                        }
 
-                    is SensorsUIState.Tracking -> {
-                        MaterialTheme.colors.secondary
+                        is SensorsUIState.Tracking -> {
+                            MaterialTheme.colors.secondary
+                        }
+
+                        else -> MaterialTheme.colors.primary
+                    },
+                ),
+                onClick = {
+                    when(uiState.value) {
+                        is SensorsUIState.Default -> {
+                            vm.startTracking(ctx)
+                            activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        }
+                        is SensorsUIState.Tracking -> {
+                            vm.stopTracking(ctx)
+                            activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        }
+                        else -> {}
                     }
                 },
-            ),
-            onClick = {
-                when(uiState.value) {
+                imageVector = when(uiState.value) {
                     is SensorsUIState.Default -> {
-                        vm.startTracking(ctx)
-                        activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        Icons.Default.PlayArrow
                     }
                     is SensorsUIState.Tracking -> {
-                        vm.stopTracking(ctx)
-                        activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        Icons.Default.Close
                     }
-                }
-            },
-            imageVector = when(uiState.value) {
-                is SensorsUIState.Default -> {
-                    Icons.Default.PlayArrow
-                }
-                is SensorsUIState.Tracking -> {
-                    Icons.Default.Close
-                }
-            },
-            contentDescription = btnText
-        )
+                    else -> Icons.Default.Close
+                },
+                contentDescription = btnText,
+                enabled = uiState.value !is SensorsUIState.Uploading
+            )
+
+            Button(
+                modifier = Modifier.padding(top = 8.dp, start = 12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.secondary,
+                ),
+                onClick = {
+                    vm.doUpload()
+                },
+                imageVector = Icons.Default.Check,
+                contentDescription = "Upload",
+                enabled = uiState.value !is SensorsUIState.Tracking
+            )
+        }
     }
 }

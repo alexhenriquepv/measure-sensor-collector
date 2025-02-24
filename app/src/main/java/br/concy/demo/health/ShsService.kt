@@ -18,6 +18,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -28,6 +30,7 @@ class ShsService: Service() {
     private val ibiBuffer = mutableListOf<IbiMeasurement>()
     private val bufferJob = CoroutineScope(Dispatchers.IO)
     private val samplingFrequency = 1000L
+    private val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
 
     @Inject
     lateinit var hrRepository: HrRepository
@@ -56,23 +59,29 @@ class ShsService: Service() {
         override fun onDataReceived(list: List<DataPoint>) {
             if (list.isNotEmpty()) {
                 for (dp in list) {
-                    val status = dp.getValue(ValueKey.HeartRateSet.HEART_RATE_STATUS)
+                    val hrStatus = dp.getValue(ValueKey.HeartRateSet.HEART_RATE_STATUS)
                     val hrValue = dp.getValue(ValueKey.HeartRateSet.HEART_RATE)
-                    val ibiValues = dp.getValue(ValueKey.HeartRateSet.IBI_LIST)
 
-                    if (status == 1) {
+                    Log.d(TAG, "status $hrStatus")
+
+                    if (hrStatus == 1) {
                         hrBuffer.add(HrMeasurement(
-                            registeredAt = dp.timestamp.toString(),
+                            registeredAt = sdf.format(dp.timestamp),
                             measurement = hrValue
                         ))
-                        ibiValues.forEach {
-                            ibiBuffer.add(
-                                IbiMeasurement(
-                                registeredAt = dp.timestamp.toString(),
+                    }
+
+                    val validIbiValues = getValidIbi(dp)
+                    Log.d(TAG, "ibi value: $validIbiValues")
+
+                    validIbiValues.forEach {
+                        Log.d(TAG, "ibi value: $it")
+                        ibiBuffer.add(
+                            IbiMeasurement(
+                                registeredAt = sdf.format(dp.timestamp),
                                 measurement = it
                             )
-                            )
-                        }
+                        )
                     }
                 }
             }
@@ -85,6 +94,22 @@ class ShsService: Service() {
         override fun onError(err: HealthTracker.TrackerError?) {
             Log.e(TAG, "TrackerError: " + err.toString())
         }
+    }
+
+    private fun getValidIbi(dp: DataPoint) : List<Int> {
+        val ibiStatus = dp.getValue(ValueKey.HeartRateSet.IBI_STATUS_LIST)
+        val ibiValues = dp.getValue(ValueKey.HeartRateSet.IBI_LIST)
+        val validIbi = mutableListOf<Int>()
+
+        for ((i, status) in ibiStatus.withIndex()) {
+            if (status == 0 && ibiValues[i] != 0) {
+                validIbi.add(ibiValues[i])
+            } else {
+                Log.d(TAG, "Discarding: status: $status, values: ${ibiValues[i]}")
+            }
+        }
+
+        return validIbi.toList()
     }
 
     private fun startTracking() {

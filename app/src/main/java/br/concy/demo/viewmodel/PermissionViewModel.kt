@@ -28,7 +28,8 @@ class PermissionViewModel : ViewModel() {
                 android.Manifest.permission.FOREGROUND_SERVICE_HEALTH,
                 android.Manifest.permission.ACTIVITY_RECOGNITION,
                 android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.RECORD_AUDIO
             )
         )
     }

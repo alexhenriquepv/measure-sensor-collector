@@ -60,6 +60,7 @@ class PatientSelectionViewModel @Inject constructor(
     }
 
     fun onSelectPatient(patientId: Int, callback: () -> Unit) {
+        Log.d(TAG, patientId.toString())
         sharedPreferences.edit().putInt("patientId", patientId).apply()
         callback.invoke()
     }

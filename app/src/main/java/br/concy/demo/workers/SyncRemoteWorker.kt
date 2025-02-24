@@ -85,9 +85,9 @@ class SyncRemoteWorker @AssistedInject constructor(
                 patientId = prefs.getInt("patientId", 0),
                 measurements = notSyncedHR
             )
-
-            Log.d(TAG, res.message)
-
+            
+            val res = apiService.sendHrData(hrRequest)
+            Log.d(TAG, "tentando fazer requisicao" )
             notSyncedHR.forEach { it.sync = true }
             hrRepository.updateAll(notSyncedHR)
         } else {
@@ -97,15 +97,17 @@ class SyncRemoteWorker @AssistedInject constructor(
 
     private suspend fun syncIbiData() {
         val notSyncedIbi = ibiRepository.getNotSynced()
+        val patientId = prefs.getInt("patientId", 0)
         if (notSyncedIbi.isNotEmpty()) {
-            Log.d(TAG, "IBI to sync: ${notSyncedIbi.size}.")
+            Log.d(TAG, "IBI to sync: ${notSyncedIbi.size}, id: $patientId")
 
             val ibiRequest = IbiRequest(
-                patientId = prefs.getInt("patientId", 0),
+                patientId = patientId,
                 measurements = notSyncedIbi
             )
 
             val res = apiService.sendIbiData(ibiRequest)
+            Log.d(TAG, "tentando fazer requisicao" )
             Log.d(TAG, res.message)
 
             notSyncedIbi.forEach { it.sync = true }
@@ -117,8 +119,8 @@ class SyncRemoteWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         try {
-            syncAccelData()
-            syncGyroData()
+            //syncAccelData()
+            //syncGyroData()
             syncHrData()
             syncIbiData()
             return Result.success()

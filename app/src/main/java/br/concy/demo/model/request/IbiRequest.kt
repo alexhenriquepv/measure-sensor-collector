@@ -4,7 +4,8 @@ import br.concy.demo.model.entity.IbiMeasurement
 import com.google.gson.annotations.SerializedName
 
 data class IbiRequest(
-    @SerializedName("patient_id")
+    @SerializedName("id_patient")
     val patientId: Int,
+    val sensor: String = "ibi",
     val measurements: List<IbiMeasurement>
 )

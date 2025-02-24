@@ -8,11 +8,9 @@ import com.google.gson.annotations.SerializedName
 data class HrMeasurement(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-
-    @SerializedName("RegisteredAt")
+    @SerializedName("datetime")
     val registeredAt: String,
-
-    @SerializedName("Value")
+    @SerializedName("hr")
     val measurement: Int,
     var sync: Boolean = false
 )

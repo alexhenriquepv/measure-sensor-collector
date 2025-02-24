@@ -32,5 +32,9 @@ fun AppNavigation() {
         composable(route = "motion-sensors") {
             MotionSensorsScreen()
         }
+
+        composable(route = "audio-recorder") {
+            AudioRecorderScreen()
+        }
     }
 }

@@ -9,8 +9,9 @@ data class IbiMeasurement(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    @SerializedName("registered_at")
+    @SerializedName("datetime")
     val registeredAt: String,
+    @SerializedName("ibi")
     val measurement: Int,
     var sync: Boolean = false
 )
