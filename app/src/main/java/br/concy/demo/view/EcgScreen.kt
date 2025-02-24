@@ -1,5 +1,7 @@
 package br.concy.demo.view
 
+import android.app.Activity
+import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +15,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +45,7 @@ fun EcgScreen(
 ) {
 
     val ctx = LocalContext.current
+    val activity = ctx as Activity
     val ecgVM: EcgViewModel = hiltViewModel()
     val ecgUIState = ecgVM.uiState.collectAsState()
     val countdown = ecgVM.countdown.collectAsState()
@@ -53,6 +57,11 @@ fun EcgScreen(
         ),
         verticalArrangement = Arrangement.Center,
     )
+
+    LaunchedEffect(Unit) {
+        activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        ecgVM.setup(ctx)
+    }
 
     ScalingLazyColumn(
         modifier = Modifier
@@ -66,7 +75,9 @@ fun EcgScreen(
             val title = when(ecgUIState.value) {
                 is EcgUIState.Setup -> (ecgUIState.value as EcgUIState.Setup).message
                 is EcgUIState.Default -> (ecgUIState.value as EcgUIState.Default).message
-                is EcgUIState.Tracking -> (ecgUIState.value as EcgUIState.Tracking).message
+                is EcgUIState.Tracking -> {
+                    if (ecgVM.electrodeActive.value) "Electrode active" else "Electrode inactive"
+                }
                 is EcgUIState.Error -> (ecgUIState.value as EcgUIState.Error).message
                 is EcgUIState.StopTracking -> (ecgUIState.value as EcgUIState.StopTracking).message
                 is EcgUIState.SavingOnDB -> (ecgUIState.value as EcgUIState.SavingOnDB).message
@@ -159,9 +170,6 @@ fun EcgScreen(
                 is EcgUIState.SavingOnDB -> {
                     CircularProgressIndicator(
                         modifier = Modifier.fillMaxSize().padding(all = 1.dp),
-                        startAngle = 295.5f,
-                        endAngle = 245.5f,
-                        progress = 0.3f,
                         strokeWidth = ProgressIndicatorDefaults.FullScreenStrokeWidth
                     )
                 }
@@ -169,9 +177,6 @@ fun EcgScreen(
                 is EcgUIState.SendingToRemote -> {
                     CircularProgressIndicator(
                         modifier = Modifier.fillMaxSize().padding(all = 1.dp),
-                        startAngle = 295.5f,
-                        endAngle = 245.5f,
-                        progress = 0.3f,
                         strokeWidth = ProgressIndicatorDefaults.FullScreenStrokeWidth
                     )
                 }

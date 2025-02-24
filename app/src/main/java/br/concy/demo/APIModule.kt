@@ -31,8 +31,7 @@ class APIModule {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = if (logActive) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         }
-
-        // Configura o cliente HTTP com interceptador de logs e timeouts
+        
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)

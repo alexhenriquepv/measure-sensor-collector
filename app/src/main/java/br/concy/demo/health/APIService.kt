@@ -1,5 +1,7 @@
 package br.concy.demo.health
 
+import br.concy.demo.model.entity.EcgMeasurement
+import br.concy.demo.model.entity.HrMeasurement
 import br.concy.demo.model.entity.Patient
 import br.concy.demo.model.request.AccelRequest
 import br.concy.demo.model.request.EcgRequest
@@ -25,9 +27,10 @@ interface APIService {
     @GET("get_patients.php")
     suspend fun getPatients(): List<Patient>
 
-    @POST("ecg/multiple")
+    @POST("patients/{patientId}/ecg")
     suspend fun sendEcgData(
-        @Body data: EcgRequest
+        @Path("patientId") patientId: Int,
+        @Body measurements: List<EcgMeasurement>
     ) : EcgResponse
 
     @POST("accelerometer/multiple")
@@ -42,7 +45,8 @@ interface APIService {
 
     @POST("post_patient_sensors_hr.php")
     suspend fun sendHrData(
-        @Body data: HrRequest
+        @Path("patientId") patientId: Int,
+        @Body measurements: List<HrMeasurement>
     ) : HrResponse
 
     @POST("post_patient_sensors_glicodex.php")

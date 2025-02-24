@@ -91,6 +91,7 @@ dependencies {
     implementation(libs.health.services.client)
     implementation(libs.guava)
     implementation(libs.retrofit)
+    implementation(libs.logging.interceptor)
     implementation(libs.gson)
     implementation(libs.logging.interceptor)
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
