@@ -37,7 +37,7 @@ class SyncRemoteWorker @AssistedInject constructor(
         Mark this registers as synced.
      */
     private suspend fun syncAccelData() {
-        val notSyncedAccel = accelRepository.getNotSynced()
+        /*val notSyncedAccel = accelRepository.getNotSynced()
         if (notSyncedAccel.isNotEmpty()) {
             Log.d(TAG, "Accel to sync: ${notSyncedAccel.size}.")
 
@@ -53,7 +53,7 @@ class SyncRemoteWorker @AssistedInject constructor(
             accelRepository.updateAll(notSyncedAccel)
         } else {
             Log.d(TAG, "Accel already synced")
-        }
+        }*/
     }
 
     private suspend fun syncGyroData() {

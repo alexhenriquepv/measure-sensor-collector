@@ -41,7 +41,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".health.SensorsService" android:foregroundServiceType="health" />
+        <service android:name=".health.MotionSensorsService" android:foregroundServiceType="health" />
         <service android:name=".health.ShsService" android:foregroundServiceType="health" />
 
         <provider

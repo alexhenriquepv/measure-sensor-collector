@@ -10,11 +10,16 @@ data class AccelMeasurement(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    @SerializedName("registered_at")
+    @SerializedName("RegisteredAt")
     val registeredAt: String,
 
+    @SerializedName("X")
     val x: Float,
+
+    @SerializedName("Y")
     val y: Float,
+
+    @SerializedName("Z")
     val z: Float,
     var sync: Boolean = false
 )

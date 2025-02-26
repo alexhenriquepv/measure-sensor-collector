@@ -31,7 +31,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SensorsService: Service(), SensorEventListener {
+class MotionSensorsService: Service(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private lateinit var accelerometer: Sensor

@@ -51,6 +51,7 @@ fun ShsScreen(
             text = "SHS Activated"
             btnText = "Stop Collect"
         }
+        else -> {}
     }
 
     LaunchedEffect(Unit) {
@@ -76,6 +77,8 @@ fun ShsScreen(
                 is SensorsUIState.Tracking -> {
                     MaterialTheme.colors.secondary
                 }
+
+                else -> MaterialTheme.colors.primary
             },
             fontSize = 16.sp
         )
@@ -91,6 +94,8 @@ fun ShsScreen(
                     is SensorsUIState.Tracking -> {
                         MaterialTheme.colors.secondary
                     }
+
+                    else -> MaterialTheme.colors.primary
                 },
             ),
             onClick = {
@@ -103,6 +108,7 @@ fun ShsScreen(
                         vm.stopTracking(ctx)
                         activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     }
+                    else -> {}
                 }
             },
             imageVector = when(uiState.value) {
@@ -112,6 +118,7 @@ fun ShsScreen(
                 is SensorsUIState.Tracking -> {
                     Icons.Default.Close
                 }
+                else -> Icons.Default.Close
             },
             contentDescription = btnText
         )

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Text
@@ -20,7 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.ButtonDefaults
+import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.ProgressIndicatorDefaults
+import br.concy.demo.uistate.EcgUIState
 import br.concy.demo.uistate.SensorsUIState
 import br.concy.demo.viewmodel.SensorsViewModel
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
@@ -40,12 +44,22 @@ fun MotionSensorsScreen(
 
     when(uiState.value) {
         is SensorsUIState.Default -> {
-            text = "Sensors Inactivated"
+            text = "Motion Sensors"
             btnText = "Start Service"
         }
         is SensorsUIState.Tracking -> {
-            text = "Sensors Activated"
+            text = "Collecting data"
             btnText = "Stop Service"
+        }
+
+        is SensorsUIState.FinishTracking -> {
+            text = "Tracking completed"
+            btnText = "Send to Remote"
+        }
+
+        is SensorsUIState.SendingToRemote -> {
+            text = "Sending to Remote.."
+            btnText = ""
         }
     }
 
@@ -72,42 +86,62 @@ fun MotionSensorsScreen(
                 is SensorsUIState.Tracking -> {
                     MaterialTheme.colors.secondary
                 }
+
+                else -> MaterialTheme.colors.primary
             },
             fontSize = 16.sp
         )
 
-        Button(
-            modifier = Modifier.padding(top = 8.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = when(uiState.value) {
-                    is SensorsUIState.Default -> {
-                        MaterialTheme.colors.primary
-                    }
+        if (uiState.value is SensorsUIState.SendingToRemote) {
+            CircularProgressIndicator(
+                modifier = Modifier.fillMaxSize().padding(all = 1.dp),
+                strokeWidth = ProgressIndicatorDefaults.FullScreenStrokeWidth
+            )
+        } else {
+            Button(
+                modifier = Modifier.padding(top = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = when(uiState.value) {
+                        is SensorsUIState.Default -> {
+                            MaterialTheme.colors.primary
+                        }
 
-                    is SensorsUIState.Tracking -> {
-                        MaterialTheme.colors.secondary
+                        is SensorsUIState.Tracking -> {
+                            MaterialTheme.colors.secondary
+                        }
+
+                        else -> MaterialTheme.colors.primary
+                    },
+                ),
+                onClick = {
+                    when(uiState.value) {
+                        is SensorsUIState.Default -> {
+                            vm.startTracking(ctx)
+                        }
+                        is SensorsUIState.FinishTracking -> {
+                            vm.sendToRemote()
+                        }
+                        is SensorsUIState.Tracking -> {
+                            vm.stopTracking(ctx)
+                        }
+
+                        else -> {}
                     }
                 },
-            ),
-            onClick = {
-                when(uiState.value) {
+                imageVector = when(uiState.value) {
                     is SensorsUIState.Default -> {
-                        vm.startTracking(ctx)
+                        Icons.Default.PlayArrow
                     }
                     is SensorsUIState.Tracking -> {
-                        vm.stopTracking(ctx)
+                        Icons.Default.Close
                     }
-                }
-            },
-            imageVector = when(uiState.value) {
-                is SensorsUIState.Default -> {
-                    Icons.Default.PlayArrow
-                }
-                is SensorsUIState.Tracking -> {
-                    Icons.Default.Close
-                }
-            },
-            contentDescription = btnText
-        )
+                    is SensorsUIState.FinishTracking -> {
+                        Icons.Default.Check
+                    }
+                    else -> Icons.Default.Close
+                },
+                contentDescription = btnText
+            )
+        }
     }
 }
