@@ -3,6 +3,7 @@ package br.concy.demo.health
 import br.concy.demo.model.entity.EcgMeasurement
 import br.concy.demo.model.entity.HrMeasurement
 import br.concy.demo.model.entity.Patient
+import br.concy.demo.model.entity.SkinTempMeasurement
 import br.concy.demo.model.request.AccelRequest
 import br.concy.demo.model.request.EcgRequest
 import br.concy.demo.model.request.GyroRequest
@@ -27,6 +28,12 @@ interface APIService {
     suspend fun sendEcgData(
         @Path("patientId") patientId: Int,
         @Body measurements: List<EcgMeasurement>
+    ) : EcgResponse
+
+    @POST("patients/{patientId}/skin-temperature")
+    suspend fun sendSkinTempData(
+        @Path("patientId") patientId: Int,
+        @Body measurements: List<SkinTempMeasurement>
     ) : EcgResponse
 
     @POST("accelerometer/multiple")

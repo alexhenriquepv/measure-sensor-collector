@@ -65,8 +65,9 @@ fun ServiceSelectionScreen(
                 ),
                 onClick = {
                     when (item) {
-                        ServiceType.SamsungECG -> navController.navigate("samsung-ecg")
-                        ServiceType.SamsungHR -> navController.navigate("samsung-hr")
+                        ServiceType.OnDemandECG -> navController.navigate("samsung-ecg")
+                        ServiceType.OnDemandHR -> navController.navigate("samsung-hr")
+                        ServiceType.OnDemandSkinTemp -> navController.navigate("skin-temp")
                         ServiceType.MotionSensors -> navController.navigate("motion-sensors")
                     }
                 }
@@ -76,7 +77,8 @@ fun ServiceSelectionScreen(
 }
 
 enum class ServiceType(val serviceName: String) {
-    SamsungECG("Samsung ECG"),
-    SamsungHR("Samsung HR"),
+    OnDemandECG("On demand ECG"),
+    OnDemandSkinTemp("On demand Skin Temp"),
+    OnDemandHR("On demand HR"),
     MotionSensors("Motion Sensors")
 }

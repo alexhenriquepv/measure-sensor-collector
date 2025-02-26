@@ -29,6 +29,10 @@ fun AppNavigation() {
             ShsScreen()
         }
 
+        composable(route = "skin-temp") {
+            SkinTempScreen()
+        }
+
         composable(route = "motion-sensors") {
             MotionSensorsScreen()
         }

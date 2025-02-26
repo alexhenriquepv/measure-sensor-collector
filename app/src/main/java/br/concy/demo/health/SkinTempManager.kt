@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import br.concy.demo.TAG
 import br.concy.demo.model.entity.EcgMeasurement
-import br.concy.demo.model.repository.EcgRepository
+import br.concy.demo.model.entity.SkinTempMeasurement
 import com.samsung.android.service.health.tracking.HealthTracker
 import com.samsung.android.service.health.tracking.data.DataPoint
 import com.samsung.android.service.health.tracking.data.ValueKey
@@ -15,15 +15,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class EcgManager(
+class SkinTempManager(
     private val apiService: APIService,
-    private val ecgRepository: EcgRepository,
     private val onError: (message: String) -> Unit,
     private val onServiceConnection: () -> Unit,
     private val onStartTracking: () -> Unit,
@@ -35,10 +33,8 @@ class EcgManager(
 ) {
 
     private val _countdownTime = MutableStateFlow(COUNTDOWN_DEFAULT)
-    private val _electrodeActive = MutableStateFlow(false)
-    private val _ecgBuffer = mutableListOf<Float>()
+    private val _buffer = mutableListOf<SkinTempMeasurement>()
 
-    val electrodeActive = _electrodeActive.asStateFlow()
     val countdown = _countdownTime.asStateFlow()
     private var countdownJob: Job? = null
 
@@ -49,7 +45,7 @@ class EcgManager(
         errorCallback = { onError("Fail on Samsung Health Connection") }
     )
 
-    private val ecgListener = object : HealthTracker.TrackerEventListener {
+    private val skinTempListener = object : HealthTracker.TrackerEventListener {
         override fun onDataReceived(list: List<DataPoint>) {
             Log.d(TAG, "onDataReceived")
             if (_countdownTime.value == COUNTDOWN_DEFAULT) {
@@ -57,17 +53,20 @@ class EcgManager(
             }
 
             if (list.isNotEmpty()) {
-                val leadOff = list[0].getValue(ValueKey.EcgSet.LEAD_OFF)
-                if (leadOff == 5) {
-                    Log.e(TAG, "LEAD_OFF")
-                    _electrodeActive.value = false
-                } else {
-                    _electrodeActive.value = true
-                    for (dp in list) {
-                        val currentECG = dp.getValue(ValueKey.EcgSet.ECG_MV)
-                        if (currentECG > 0) {
-                            _ecgBuffer.add(currentECG)
-                        }
+                val status = list[0].getValue(ValueKey.SkinTemperatureSet.STATUS)
+                Log.d(TAG, "Skin temp status: $status")
+                for (dp in list) {
+                    val currentVal = dp.getValue(ValueKey.SkinTemperatureSet.OBJECT_TEMPERATURE)
+                    Log.d(TAG, "Skin temp: $currentVal")
+                    if (currentVal > 0) {
+                        val date = Date()
+                        val formattedDate = sdf.format(date)
+
+                        val item = SkinTempMeasurement(
+                            measurement = currentVal,
+                            registeredAt = formattedDate
+                        )
+                        _buffer.add(item)
                     }
                 }
             }
@@ -83,11 +82,11 @@ class EcgManager(
         }
     }
 
-    suspend fun saveOnDatabase() {
+    fun saveOnDatabase() {
         Log.d(TAG, "saveOnDatabase")
         onSavingOnDB()
 
-        val measurements = _ecgBuffer.map { item ->
+        /*val measurements = _buffer.map { item ->
             val date = Date()
             val formattedDate = sdf.format(date)
 
@@ -97,19 +96,19 @@ class EcgManager(
             )
         }
 
-        ecgRepository.insertAll(measurements)
+        ecgRepository.insertAll(measurements)*/
         sentToRemote()
     }
 
-    private suspend fun sentToRemote() {
+    private fun sentToRemote() {
         Log.d(TAG, "sentToRemote - Patient ID: $patientId")
         onSendingToRemote()
 
-        val measurements = ecgRepository.getAll()
+        val measurements = _buffer.toList()
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val res = apiService.sendEcgData(patientId, measurements)
+                val res = apiService.sendSkinTempData(patientId, measurements)
                 Log.d(TAG, res.message)
                 onComplete()
             } catch (e: Exception) {
@@ -142,7 +141,7 @@ class EcgManager(
 
     fun startTracking() {
         Log.d(TAG, "startTracking")
-        shc.ecgTracker.setEventListener(ecgListener)
+        shc.skinTempTracker.setEventListener(skinTempListener)
         onStartTracking()
     }
 
@@ -152,13 +151,13 @@ class EcgManager(
         countdownJob?.cancel()
         countdownJob = null
 
-        onStopTracking(_ecgBuffer.size)
-        shc.ecgTracker.unsetEventListener()
+        onStopTracking(_buffer.size)
+        shc.skinTempTracker.unsetEventListener()
 
-        if (_ecgBuffer.size == 0) {
+        if (_buffer.size == 0) {
             resetSetup()
         } else {
-            Log.d(TAG, "measurements count: ${_ecgBuffer.size}")
+            Log.d(TAG, "measurements count: ${_buffer.size}")
         }
     }
 
@@ -173,10 +172,10 @@ class EcgManager(
     fun resetSetup() {
         Log.d(TAG, "resetSetup")
         _countdownTime.value = COUNTDOWN_DEFAULT
-        _ecgBuffer.clear()
-        runBlocking {
-            ecgRepository.deleteAll()
-        }
+        _buffer.clear()
+//        runBlocking {
+//            ecgRepository.deleteAll()
+//        }
     }
 
     companion object {

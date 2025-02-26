@@ -17,6 +17,8 @@ class SamsungHealthConnection(
     private lateinit var htService: HealthTrackingService
     lateinit var ecgTracker: HealthTracker
     lateinit var hrTracker: HealthTracker
+    lateinit var skinTempTracker: HealthTracker
+    var initializedService = false
 
     fun connect(context: Context) {
         val samsungConnectionListener = object : ConnectionListener {
@@ -25,6 +27,8 @@ class SamsungHealthConnection(
                 Log.d(TAG, "Health data service is connected")
                 ecgTracker = htService.getHealthTracker(HealthTrackerType.ECG_ON_DEMAND)
                 hrTracker = htService.getHealthTracker(HealthTrackerType.HEART_RATE_CONTINUOUS)
+                skinTempTracker = htService.getHealthTracker(HealthTrackerType.SKIN_TEMPERATURE_ON_DEMAND)
+                initializedService = true
                 successCallback()
             }
 
@@ -41,6 +45,10 @@ class SamsungHealthConnection(
         Log.d(TAG, "Setting up Health data service..")
         htService = HealthTrackingService(samsungConnectionListener, context)
         htService.connectService()
+    }
+
+    fun isInitialized(): Boolean {
+        return initializedService
     }
 
     fun disconnect() {
